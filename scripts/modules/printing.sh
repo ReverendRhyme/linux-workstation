@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 3D Printing module
 # Installs slicers: OrcaSlicer, Bambu Studio, etc.
+# LEGACY: Ansible role `printing` is the canonical install path.
 
 install_printing() {
     log_section "3D Printing Stack"

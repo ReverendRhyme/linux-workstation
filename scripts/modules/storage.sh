@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Storage module
 # Configures drive mounts and storage layout
+# LEGACY: Ansible role `storage` is the canonical install path.
 
 MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
