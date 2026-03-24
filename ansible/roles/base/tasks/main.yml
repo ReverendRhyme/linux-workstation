@@ -1,0 +1,128 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+
+- name: Install core utilities
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - software-properties-common
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - build-essential
+    state: present
+
+- name: Install system monitoring tools
+  apt:
+    name:
+      - htop
+      - btop
+      - neofetch
+      - ncdu
+    state: present
+
+- name: Install CLI tools
+  apt:
+    name:
+      - ripgrep
+      - fd-find
+      - bat
+      - fzf
+      - tree
+      - jq
+    state: present
+
+- name: Install Flatpak
+  apt:
+    name: flatpak
+    state: present
+
+- name: Add Flathub repository
+  command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  changed_when: false
+
+- name: Install LibreOffice (Office suite)
+  apt:
+    name:
+      - libreoffice
+      - libreoffice-gnome
+    state: present
+
+- name: Install rclone (cloud sync)
+  apt:
+    name: rclone
+    state: present
+
+- name: Install FileZilla (FTP client)
+  apt:
+    name: filezilla
+    state: present
+
+- name: Install Notepadqq (Notepad++ alternative)
+  apt:
+    name: notepadqq
+    state: present
+  failed_when: false
+
+- name: Check 1Password flatpak
+  command: flatpak info com.1password.1Password
+  register: flatpak_1password
+  changed_when: false
+  failed_when: false
+
+- name: Install 1Password (password manager)
+  command: flatpak install -y flathub com.1password.1Password
+  when: flatpak_1password.rc != 0
+  failed_when: false
+
+- name: Check Slack flatpak
+  command: flatpak info com.slack.Slack
+  register: flatpak_slack
+  changed_when: false
+  failed_when: false
+
+- name: Install Slack
+  command: flatpak install -y flathub com.slack.Slack
+  when: flatpak_slack.rc != 0
+  failed_when: false
+
+- name: Check Zoom flatpak
+  command: flatpak info us.zoom.Zoom
+  register: flatpak_zoom
+  changed_when: false
+  failed_when: false
+
+- name: Install Zoom
+  command: flatpak install -y flathub us.zoom.Zoom
+  when: flatpak_zoom.rc != 0
+  failed_when: false
+
+- name: Check Obsidian flatpak
+  command: flatpak info md.obsidian.Obsidian
+  register: flatpak_obsidian
+  changed_when: false
+  failed_when: false
+
+- name: Install Obsidian (note-taking)
+  command: flatpak install -y flathub md.obsidian.Obsidian
+  when: flatpak_obsidian.rc != 0
+  failed_when: false
+
+- name: Check Spotify flatpak
+  command: flatpak info com.spotify.Client
+  register: flatpak_spotify
+  changed_when: false
+  failed_when: false
+
+- name: Install Spotify
+  command: flatpak install -y flathub com.spotify.Client
+  when: flatpak_spotify.rc != 0
+  failed_when: false

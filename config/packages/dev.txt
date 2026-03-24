@@ -1,0 +1,20 @@
+# Development packages
+
+# Containerization
+docker.io
+docker-compose-plugin
+
+# Development tools
+python3-pip
+code
+
+# Version control
+git
+
+# Web development
+nodejs
+npm
+
+# Optional dev tools
+vim
+tmux

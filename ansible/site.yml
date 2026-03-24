@@ -1,0 +1,25 @@
+- name: Workstation Provisioning
+  hosts: localhost
+  become: yes
+
+  roles:
+    - role: base
+      tags: [base]
+    - role: gaming
+      tags: [gaming]
+    - role: cad
+      tags: [cad]
+    - role: printing
+      tags: [printing]
+    - role: dev
+      tags: [dev]
+    - role: security
+      tags: [security]
+    - role: storage
+      tags: [storage]
+    - role: cloud
+      tags: [cloud]
+    - role: desktop
+      tags: [desktop]
+    - role: verify
+      tags: [verify]

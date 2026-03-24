@@ -1,0 +1,31 @@
+{
+  "name": "workstation-setup",
+  "description": "Complete Pop!_OS workstation provisioning for Kevin's gaming/CAD/3D printing setup",
+  "version": "1.2.0",
+  "triggers": [
+    "/workstation",
+    "/workstation-setup",
+    "/game-setup",
+    "/linux-setup",
+    "/drives",
+    "/drive-setup",
+    "/configure-workstation",
+    "/workstation-config",
+    "set up my Linux workstation",
+    "run the setup",
+    "provision my PC",
+    "configure my drives",
+    "recommend drives"
+  ],
+  "entrypoint": "scripts/agent-configure.sh --guided",
+  "scripts": {
+    "configure": "scripts/agent-configure.sh --guided",
+    "full-setup": "scripts/full-setup.sh --profile full",
+    "profile": "scripts/full-setup.sh --profile",
+    "hardware": "scripts/full-setup.sh --hardware",
+    "bootstrap": "scripts/full-setup.sh --bootstrap",
+    "drives": "scripts/drive-recommend.sh --detect",
+    "verify": "scripts/post-install-check.sh"
+  },
+  "repo": "~/linux-workstation"
+}

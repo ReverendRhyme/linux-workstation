@@ -1,0 +1,49 @@
+- name: Install development toolchains
+  apt:
+    name:
+      - build-essential
+      - zsh
+      - python3-pip
+      - docker.io
+      - docker-compose-plugin
+    state: present
+
+- name: Add user to docker group
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
+
+- name: Set CPU governor to performance
+  apt:
+    name: cpufrequtils
+    state: present
+
+- name: Configure cpufrequtils
+  lineinfile:
+    path: /etc/default/cpufrequtils
+    create: yes
+    line: GOVERNOR="performance"
+    mode: '0644'
+
+- name: Disable ondemand service
+  systemd:
+    name: ondemand
+    enabled: no
+    state: stopped
+  failed_when: false
+
+- name: Enable cpufrequtils service
+  systemd:
+    name: cpufrequtils
+    enabled: yes
+    state: started
+  failed_when: false
+
+- name: Install Oh My Zsh
+  shell: |
+    RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  args:
+    creates: /home/{{ ansible_user_id }}/.oh-my-zsh
+  become: yes
+  become_user: "{{ ansible_user_id }}"

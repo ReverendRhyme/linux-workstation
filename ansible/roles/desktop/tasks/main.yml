@@ -1,0 +1,13 @@
+---
+- name: Install COSMIC desktop package
+  ansible.builtin.apt:
+    name: pop-desktop
+    state: present
+  failed_when: false
+
+- name: Print COSMIC desktop tips
+  ansible.builtin.debug:
+    msg:
+      - "Super + Space: launcher"
+      - "Super + T: tiling toggle"
+      - "Configure COSMIC in System Settings"

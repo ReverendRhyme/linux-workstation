@@ -1,0 +1,42 @@
+- name: Install Fusion 360 dependencies
+  apt:
+    name:
+      - wine
+      - wine64
+      - wine32
+      - winetricks
+      - p7zip
+      - p7zip-full
+      - p7zip-rar
+      - curl
+      - wget
+      - cabextract
+      - fonts-wine
+    state: present
+
+- name: Download Fusion 360 installer
+  get_url:
+    url: "https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/setup/autodesk_fusion_installer_x86-64.sh"
+    dest: "/tmp/fusion360_installer.sh"
+    mode: '0755'
+
+- name: Install Fusion 360
+  command: "/tmp/fusion360_installer.sh --install --default"
+  args:
+    creates: "{{ ansible_user_dir }}/.wine-pfx/Fusion 360"
+  notify: Restart wine services
+
+- name: Create Fusion 360 desktop entry
+  copy:
+    dest: "{{ ansible_user_dir }}/.local/share/applications/fusion360.desktop"
+    content: |
+      [Desktop Entry]
+      Name=Autodesk Fusion 360
+      Comment=3D CAD, CAM, and CAE software
+      Exec=wine "{{ ansible_user_dir }}/.wine-pfx/Fusion 360/Fusion360.exe"
+      Icon={{ ansible_user_dir }}/.wine-pfx/Fusion 360/Fusion360.png
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;CAD;
+    mode: '0644'
+  when: false

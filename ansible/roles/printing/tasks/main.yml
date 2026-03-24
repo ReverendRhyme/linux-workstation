@@ -1,0 +1,120 @@
+- name: Install OrcaSlicer (3D printing slicer)
+  block:
+    - name: Download OrcaSlicer AppImage
+      get_url:
+        url: "https://github.com/SoftFever/OrcaSlicer/releases/latest/download/OrcaSlicer-Linux-AppImage-{{ orcaslicer_version }}.AppImage"
+        dest: "/tmp/OrcaSlicer.AppImage"
+        mode: '0755'
+
+    - name: Install OrcaSlicer to /opt
+      copy:
+        src: "/tmp/OrcaSlicer.AppImage"
+        dest: "/opt/OrcaSlicer.AppImage"
+        remote_src: yes
+        mode: '0755'
+
+    - name: Create OrcaSlicer desktop entry
+      copy:
+        dest: "/usr/local/share/applications/OrcaSlicer.desktop"
+        content: |
+          [Desktop Entry]
+          Name=OrcaSlicer
+          Comment=3D Printer Slicer
+          Exec=/opt/OrcaSlicer.AppImage
+          Icon=org.softfever.orcaslicer
+          Terminal=false
+          Type=Application
+          Categories=Graphics;3DGraphics;
+        mode: '0644'
+  vars:
+    orcaslicer_version: "1.9.0"
+
+- name: Install Bambu Studio (Bambu Lab slicer)
+  block:
+    - name: Download Bambu Studio AppImage
+      get_url:
+        url: "https://github.com/bambulab/BambuStudio/releases/latest/download/BambuStudio_linux_amd64_v{{ bambustudio_version }}.zip"
+        dest: "/tmp/BambuStudio.zip"
+        mode: '0755'
+
+    - name: Extract Bambu Studio
+      unarchive:
+        src: "/tmp/BambuStudio.zip"
+        dest: "/opt/"
+        remote_src: yes
+        creates: "/opt/BambuStudio"
+
+    - name: Create Bambu Studio desktop entry
+      copy:
+        dest: "/usr/local/share/applications/BambuStudio.desktop"
+        content: |
+          [Desktop Entry]
+          Name=Bambu Studio
+          Comment=Bambu Lab 3D Printer Slicer
+          Exec=/opt/BambuStudio/bambu-studio
+          Icon=/opt/BambuStudio/resources/icons/AppIcon.ico
+          Terminal=false
+          Type=Application
+          Categories=Graphics;3DGraphics;
+        mode: '0644'
+  vars:
+    bambustudio_version: "2.0.0"
+
+- name: Install CHITUBOX (resin printing slicer)
+  block:
+    - name: Download CHITUBOX AppImage
+      get_url:
+        url: "https://github.com/chitubox/CHITUBOX-Desktop/releases/latest/download/CHITUBOX-Desktop-linux_x64_v{{ chitubox_version }}.AppImage"
+        dest: "/tmp/CHITUBOX.AppImage"
+        mode: '0755'
+
+    - name: Install CHITUBOX to /opt
+      copy:
+        src: "/tmp/CHITUBOX.AppImage"
+        dest: "/opt/CHITUBOX.AppImage"
+        remote_src: yes
+        mode: '0755'
+
+    - name: Create CHITUBOX desktop entry
+      copy:
+        dest: "/usr/local/share/applications/CHITUBOX.desktop"
+        content: |
+          [Desktop Entry]
+          Name=CHITUBOX
+          Comment=Resin 3D Printer Slicer
+          Exec=/opt/CHITUBOX.AppImage
+          Icon=chitubox
+          Terminal=false
+          Type=Application
+          Categories=Graphics;3DGraphics;
+        mode: '0644'
+  vars:
+    chitubox_version: "2.0"
+
+- name: Install PrusaSlicer (alternative slicer)
+  apt:
+    name: prusaslicer
+    state: present
+  failed_when: false
+
+- name: Install Cura (Ultimaker slicer)
+  apt:
+    name: cura
+    state: present
+  failed_when: false
+
+- name: Install FreeCAD (for 3D modeling)
+  apt:
+    name: freecad
+    state: present
+
+- name: Install OpenSCAD
+  apt:
+    name: openscad
+    state: present
+
+- name: Create 3D printing data directory
+  file:
+    path: "{{ ansible_user_dir }}/3dprinting"
+    state: directory
+    mode: '0755'

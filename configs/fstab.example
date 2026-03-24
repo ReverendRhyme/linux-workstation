@@ -1,0 +1,86 @@
+# WORKSTATION-EXAMPLE Hardware Layout
+# Based on WORKSTATION-EXAMPLE.xml spec report
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# RECOMMENDED DRIVE ASSIGNMENTS
+# ═══════════════════════════════════════════════════════════════════════════
+#
+#  OS Drive (1TB NVMe - SN580):
+#    /dev/nvme1n1  - WD Blue SN580 1TB
+#    Partition: /boot/efi, /, /home, /mnt/storage
+#
+#  Games Drive (2TB NVMe - 990 PRO):
+#    /dev/nvme0n1  - Samsung SSD 990 PRO 2TB
+#    Mount: /mnt/games (entire drive)
+#
+#  Software Drive (SATA SSD/RAID):
+#    /dev/sda      - Intel 180GB SATA SSD
+#    Mount: /mnt/software
+#
+#  RAID Array (Legacy Drives):
+#    /dev/sdb      - 2x or 3x Seagate ST3250410AS (232GB) in RAID
+#    Mount: /mnt/raid or /mnt/software
+#
+#  Bulk Storage (HDD):
+#    /dev/sdc      - WD Red 2TB
+#    Mount: /mnt/backup
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# MOUNT POINTS
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# /mnt/games      - ALL game libraries (Steam, GOG, Epic, Heroic)
+#                   Fastest drive = best game loading times
+#
+# /mnt/software   - Software installations, Docker volumes, dev projects
+#                   SATA SSD or RAID array
+#
+# /mnt/storage    - Projects, documents, frequently-accessed files
+#                   On OS drive (fast access)
+#
+# /mnt/backup     - Archives, backups, rarely-accessed files
+#                   HDD = cheap bulk storage
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# DETECTED HARDWARE
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# NVMe Drives:
+#   /dev/nvme0n1  - Samsung SSD 990 PRO 2TB (FASTEST - Games!)
+#   /dev/nvme1n1  - WD Blue SN580 1TB (OS)
+#
+# SATA Drives:
+#   /dev/sda      - Intel 180GB SATA SSD (Software)
+#   /dev/sdb      - 2TB WD Red HDD (Bulk storage)
+#
+# Legacy/RAID:
+#   /dev/sdc      - 3x 232GB Seagate ST3250410AS (RAID - Software)
+#
+# External:
+#   /dev/sdd      - 4.6TB Seagate USB (External backup)
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# FSTAB EXAMPLES
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Use `lsblk -f` and `sudo blkid` to find actual UUIDs
+#
+# Games drive (990 PRO 2TB):
+#   UUID=<samsung-990-pro-uuid> /mnt/games ext4 defaults,nofail 0 2
+#
+# Software/RAID (SATA SSD):
+#   UUID=<intel-sata-uuid> /mnt/software ext4 defaults,nofail 0 2
+#
+# Storage (on OS drive):
+#   UUID=<wd-blue-uuid> /mnt/storage ext4 defaults,nofail 0 2
+#
+# Bulk storage (WD Red 2TB):
+#   UUID=<wd-red-uuid> /mnt/backup ext4 defaults,nofail 0 2
+#
+# RAID array (use /dev/mdX):
+#   /dev/md0 /mnt/software ext4 defaults,nofail 0 2
+#
+# Notes:
+#   - nofail: prevents boot failure if drive disconnected
+#   - ext4 recommended for gaming (better permissions than NTFS)
+#   - For NTFS: mount with uid=<user>,gid=<group>,umask=0022

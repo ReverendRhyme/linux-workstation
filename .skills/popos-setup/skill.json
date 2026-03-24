@@ -1,0 +1,23 @@
+{
+  "name": "popos-setup",
+  "description": "Automated Pop!_OS (COSMIC) workstation setup with guided questions and profile-based provisioning",
+  "version": "1.0.0",
+  "triggers": [
+    "/popos-setup",
+    "/popos",
+    "/cosmic-setup",
+    "set up pop os",
+    "automate pop os setup",
+    "configure my pop os machine"
+  ],
+  "entrypoint": "scripts/popos-auto.sh",
+  "scripts": {
+    "auto": "scripts/popos-auto.sh",
+    "guided-config": "scripts/agent-configure.sh --guided",
+    "hardware": "scripts/full-setup.sh --hardware",
+    "check": "scripts/full-setup.sh --check",
+    "provision-full": "scripts/full-setup.sh --profile full",
+    "verify": "scripts/post-install-check.sh"
+  },
+  "repo": "~/linux-workstation"
+}

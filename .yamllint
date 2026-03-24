@@ -1,0 +1,9 @@
+extends: default
+
+ignore: |
+  .venv-lint/
+
+rules:
+  document-start: disable
+  truthy: disable
+  line-length: disable

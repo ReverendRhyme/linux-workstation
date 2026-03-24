@@ -1,0 +1,7 @@
+profile: min
+skip_list:
+  - fqcn
+  - no-changed-when
+  - var-naming
+  - key-order
+  - yaml

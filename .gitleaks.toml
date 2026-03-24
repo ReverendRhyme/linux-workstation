@@ -1,0 +1,10 @@
+title = "linux-workstation gitleaks config"
+
+[allowlist]
+description = "Allow known placeholders in docs"
+regexes = [
+  '''<repo-url>''',
+  '''<repo-directory>''',
+  '''<your-username>''',
+  '''you@example.com'''
+]

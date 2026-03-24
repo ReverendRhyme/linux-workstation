@@ -1,0 +1,66 @@
+- name: Install gaming packages
+  apt:
+    name:
+      - steam
+      - gamemode
+      - libgamemode0
+      - libgamemodeauto0
+      - mangohud
+      - vulkan-tools
+      - mesa-utils
+    state: present
+
+- name: Install media codecs
+  apt:
+    name: ubuntu-restricted-extras
+    state: present
+
+- name: Check Heroic Games Launcher flatpak
+  command: flatpak info com.heroicgameslauncher.hgl
+  register: flatpak_heroic
+  changed_when: false
+  failed_when: false
+
+- name: Install Heroic Games Launcher
+  command: flatpak install -y flathub com.heroicgameslauncher.hgl
+  when: flatpak_heroic.rc != 0
+
+- name: Check ProtonUp-Qt flatpak
+  command: flatpak info net.davidotek.pupgui2
+  register: flatpak_protonup
+  changed_when: false
+  failed_when: false
+
+- name: Install ProtonUp-Qt
+  command: flatpak install -y flathub net.davidotek.pupgui2
+  when: flatpak_protonup.rc != 0
+
+- name: Check Discord flatpak
+  command: flatpak info com.discordapp.Discord
+  register: flatpak_discord
+  changed_when: false
+  failed_when: false
+
+- name: Install Discord (for gaming voice chat)
+  command: flatpak install -y flathub com.discordapp.Discord
+  when: flatpak_discord.rc != 0
+
+- name: Check VLC flatpak
+  command: flatpak info org.videolan.VLC
+  register: flatpak_vlc
+  changed_when: false
+  failed_when: false
+
+- name: Install VLC
+  command: flatpak install -y flathub org.videolan.VLC
+  when: flatpak_vlc.rc != 0
+
+- name: Check OBS Studio flatpak
+  command: flatpak info com.obsproject.Studio
+  register: flatpak_obs
+  changed_when: false
+  failed_when: false
+
+- name: Install OBS Studio
+  command: flatpak install -y flathub com.obsproject.Studio
+  when: flatpak_obs.rc != 0

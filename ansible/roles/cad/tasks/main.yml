@@ -1,0 +1,44 @@
+- name: Install Blender (native Linux)
+  apt:
+    name: blender
+    state: present
+
+- name: Install FreeCAD (open source CAD alternative)
+  apt:
+    name: freecad
+    state: present
+
+- name: Install OpenSCAD (parametric CAD)
+  apt:
+    name: openscad
+    state: present
+
+- name: Install MeshLab (mesh processing)
+  apt:
+    name: meshlab
+    state: present
+
+- name: Install GIMP for texture editing
+  apt:
+    name: gimp
+    state: present
+
+- name: Install Inkscape (vector graphics)
+  apt:
+    name: inkscape
+    state: present
+
+- name: Check Flatpak Blender
+  command: flatpak info org.blender.Blender
+  register: flatpak_blender
+  changed_when: false
+  failed_when: false
+
+- name: Install Flatpak version of Blender (latest)
+  command: flatpak install -y flathub org.blender.Blender
+  when: flatpak_blender.rc != 0
+  failed_when: false
+
+- name: Install Fusion 360 web app (PWA)
+  debug:
+    msg: "Fusion 360 web version available at https://fusion.cloud.autodesk.com"

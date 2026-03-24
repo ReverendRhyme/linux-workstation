@@ -1,0 +1,23 @@
+---
+- name: Install cloud sync tools
+  ansible.builtin.apt:
+    name:
+      - rclone
+      - onedrive
+      - fuse3
+    state: present
+
+- name: Ensure Google Drive mount directory exists
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user_id }}/GoogleDrive"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+
+- name: Print cloud setup next steps
+  ansible.builtin.debug:
+    msg:
+      - "Run: rclone config"
+      - "Optional mount: rclone mount gdrive: ~/GoogleDrive --vfs-cache-mode full &"
+      - "OneDrive sync: onedrive --synchronize"

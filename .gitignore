@@ -1,0 +1,17 @@
+*.log
+.env
+.env.*
+*.retry
+*.pem
+id_rsa*
+*.csv
+*.local
+WORKSTATION-EXAMPLE.xml
+logs/hardware/
+config/deployment.local.env
+.venv-lint/
+.venv-tools/
+.filter-repo-replacements.txt
+
+!.env.example
+!*.local.example
