@@ -45,7 +45,10 @@ source ./config/defaults.env
 test -f ./config/deployment.local.env && source ./config/deployment.local.env
 ./scripts/full-setup.sh --profile "${DEPLOY_PROFILE:-full}"
 
-# 5. Configure game drives
+# 5. Verify with Ansible checks
+./scripts/full-setup.sh --verify
+
+# 6. (Optional) Manual drive helper for fstab review
 ./scripts/mount-drives.sh
 
 # One-command wrapper (does guided + provision + verify)
@@ -107,7 +110,8 @@ Dedicated E-drive dual-boot runbook:
 - [ ] Update system: `sudo apt update && sudo apt upgrade -y`
 - [ ] Clone this repo
 - [ ] Run `./bootstrap/bootstrap.sh`
-- [ ] Run `./scripts/mount-drives.sh`
+- [ ] Run `./scripts/full-setup.sh --verify`
+- [ ] (Optional) Run `./scripts/mount-drives.sh`
 - [ ] Add game drives to `/etc/fstab`
 - [ ] Install Steam + enable Proton
 - [ ] Install Heroic for Epic/GOG
@@ -136,12 +140,16 @@ linux-workstation/
 │       ├── cad/           # Blender, FreeCAD, OpenSCAD
 │       ├── printing/      # OrcaSlicer, PrusaSlicer, Cura
 │       ├── dev/           # Docker, Oh My Zsh, dev tools
-│       └── security/      # UFW firewall
+│       ├── security/      # UFW firewall
+│       ├── storage/       # Mount paths and storage prep
+│       ├── cloud/         # rclone/OneDrive tools
+│       ├── desktop/       # COSMIC desktop tuning helpers
+│       └── verify/        # Post-provision verification checks
 ├── scripts/
 │   ├── popos-auto.sh      # Guided wrapper (recommended)
 │   ├── full-setup.sh      # Main orchestrator
 │   ├── agent-configure.sh # Interactive config + local env generation
-│   ├── post-install-check.sh # Validation checks
+│   ├── post-install-check.sh # Legacy deep-check helper
 │   ├── drive-recommend.sh # Drive detection + recommendations
 │   ├── mount-drives.sh    # Mount helper
 │   └── maintenance.sh     # System updates
