@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Security module
 # Installs security tools: UFW firewall, fail2ban, etc.
+# LEGACY: Ansible role `security` is the canonical install path.
 
 install_security() {
     log_section "Security Stack"

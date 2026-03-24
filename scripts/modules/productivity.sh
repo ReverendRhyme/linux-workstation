@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Productivity module
 # Installs productivity stack: Office, cloud sync, communication
+# LEGACY: Ansible roles `base` and `cloud` are the canonical install path.
 
 install_productivity() {
     log_section "Productivity Stack"

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# LEGACY: Prefer Ansible `cloud` role via `./scripts/full-setup.sh --profile ...`.
+# This script is retained as an interactive helper.
+
 echo "=============================================="
 echo "  Google Drive Setup with rclone"
 echo "=============================================="

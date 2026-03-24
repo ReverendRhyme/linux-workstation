@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Gaming module
 # Installs gaming stack: Steam, Heroic, MangoHud, etc.
+# LEGACY: Ansible role `gaming` is the canonical install path.
 
 install_gaming() {
     log_section "Gaming Stack"

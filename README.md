@@ -310,3 +310,15 @@ vulkan-smi
 - [ProtonDB](https://www.protondb.com) - Game compatibility ratings
 - [Heroic Games Launcher](https://heroicgameslauncher.com)
 - [Ansible Documentation](https://docs.ansible.com)
+
+---
+
+## Contributing
+
+- See `CONTRIBUTING.md` for local validation and workflow expectations.
+- This repo is Ansible-first; shell scripts are orchestration helpers.
+
+## Legacy Helpers
+
+- `scripts/modules/*` and `scripts/post-install-check.sh` are retained for compatibility/reference.
+- Preferred verification path is `./scripts/full-setup.sh --verify` (Ansible role).

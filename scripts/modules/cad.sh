@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # CAD module
 # Installs CAD/3D design tools: Blender, FreeCAD, etc.
+# LEGACY: Ansible role `cad` is the canonical install path.
 
 install_cad() {
     log_section "CAD/3D Design Stack"

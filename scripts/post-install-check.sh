@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# LEGACY: Prefer `./scripts/full-setup.sh --verify` (Ansible verify role).
+# This script is retained for compatibility and manual deep checks.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 DEFAULTS_FILE="$REPO_DIR/config/defaults.env"

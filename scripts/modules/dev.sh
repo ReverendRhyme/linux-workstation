@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Development module
 # Installs development tools: Docker, Python, etc.
+# LEGACY: Ansible role `dev` is the canonical install path.
 
 install_dev() {
     log_section "Development Tools"
