@@ -6,37 +6,36 @@
 - name: Collect service facts
   ansible.builtin.service_facts:
 
-- name: Verify required binaries
+- name: Assert required apt packages are installed
+  ansible.builtin.assert:
+    that:
+      - "'curl' in ansible_facts.packages"
+      - "'git' in ansible_facts.packages"
+      - "'flatpak' in ansible_facts.packages"
+    fail_msg: "Required base packages missing: check curl, git, flatpak"
+    success_msg: "All required base packages are installed"
+
+- name: Assert core binaries are available
   ansible.builtin.command: "bash -lc 'command -v {{ item }}'"
   loop:
     - apt
     - git
     - curl
-  register: verify_required_bins
   changed_when: false
-  failed_when: false
 
-- name: Verify optional binaries
+- name: Verify optional binaries (non-failing)
   ansible.builtin.command: "bash -lc 'command -v {{ item }}'"
   loop:
     - steam
     - docker
     - zsh
     - rclone
+    - blender
   register: verify_optional_bins
   changed_when: false
   failed_when: false
 
-- name: Summarize required binary checks
-  ansible.builtin.debug:
-    msg: >-
-      Required commands present: {{ verify_required_bins.results
-      | selectattr('rc', 'equalto', 0)
-      | map(attribute='item')
-      | list
-      }}
-
-- name: Summarize optional binary checks
+- name: Report optional binary availability
   ansible.builtin.debug:
     msg: >-
       Optional commands present: {{ verify_optional_bins.results
@@ -45,12 +44,38 @@
       | list
       }}
 
-- name: Verify game mount directory exists
-  ansible.builtin.stat:
-    path: "{{ mount_games | default('/mnt/games') }}"
-  register: verify_mount_games
-
-- name: Report mount directory state
+- name: Report optional commands missing
   ansible.builtin.debug:
     msg: >-
-      Mount path {{ mount_games | default('/mnt/games') }} exists={{ verify_mount_games.stat.exists }}
+      Optional commands missing: {{ verify_optional_bins.results
+      | rejectattr('rc', 'equalto', 0)
+      | map(attribute='item')
+      | list }}
+
+- name: Assert game mount directory exists
+  ansible.builtin.stat:
+    path: "{{ mount_games }}"
+  register: verify_mount_games
+
+- name: Fail if game mount directory is missing
+  ansible.builtin.assert:
+    that: verify_mount_games.stat.exists
+    fail_msg: "Game mount directory {{ mount_games }} does not exist"
+    success_msg: "Game mount directory {{ mount_games }} exists"
+
+- name: Assert UFW is enabled
+  ansible.builtin.command: ufw status
+  register: ufw_status
+  changed_when: false
+  failed_when: false
+
+- name: Report firewall status
+  ansible.builtin.debug:
+    msg: "UFW status: {{ ufw_status.stdout_lines | default(['unknown']) }}"
+
+- name: Assert Docker service is running
+  ansible.builtin.assert:
+    that: "'docker.service' in ansible_facts.services and ansible_facts.services['docker.service'].state == 'running'"
+    fail_msg: "Docker service is not running"
+    success_msg: "Docker service is running"
+  failed_when: false

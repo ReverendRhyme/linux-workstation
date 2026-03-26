@@ -1,7 +1,6 @@
 - name: Install development toolchains
   apt:
     name:
-      - build-essential
       - zsh
       - python3-pip
       - docker.io

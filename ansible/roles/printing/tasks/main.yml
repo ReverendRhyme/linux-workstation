@@ -1,4 +1,10 @@
+- name: Check if OrcaSlicer is installed
+  ansible.builtin.stat:
+    path: /opt/OrcaSlicer.AppImage
+  register: orcaslicer_installed
+
 - name: Install OrcaSlicer (3D printing slicer)
+  when: not orcaslicer_installed.stat.exists
   block:
     - name: Download OrcaSlicer AppImage
       get_url:
@@ -26,10 +32,14 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
-  vars:
-    orcaslicer_version: "1.9.0"
+
+- name: Check if Bambu Studio is installed
+  ansible.builtin.stat:
+    path: /opt/BambuStudio
+  register: bambustudio_installed
 
 - name: Install Bambu Studio (Bambu Lab slicer)
+  when: not bambustudio_installed.stat.exists
   block:
     - name: Download Bambu Studio AppImage
       get_url:
@@ -57,10 +67,14 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
-  vars:
-    bambustudio_version: "2.0.0"
+
+- name: Check if CHITUBOX is installed
+  ansible.builtin.stat:
+    path: /opt/CHITUBOX.AppImage
+  register: chitubox_installed
 
 - name: Install CHITUBOX (resin printing slicer)
+  when: not chitubox_installed.stat.exists
   block:
     - name: Download CHITUBOX AppImage
       get_url:
@@ -88,8 +102,6 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
-  vars:
-    chitubox_version: "2.0"
 
 - name: Install PrusaSlicer (alternative slicer)
   apt:
@@ -103,18 +115,8 @@
     state: present
   failed_when: false
 
-- name: Install FreeCAD (for 3D modeling)
-  apt:
-    name: freecad
-    state: present
-
-- name: Install OpenSCAD
-  apt:
-    name: openscad
-    state: present
-
 - name: Create 3D printing data directory
   file:
-    path: "{{ ansible_user_dir }}/3dprinting"
+    path: "{{ printing_data_dir }}"
     state: directory
     mode: '0755'

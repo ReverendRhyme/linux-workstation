@@ -24,7 +24,6 @@
   command: "/tmp/fusion360_installer.sh --install --default"
   args:
     creates: "{{ ansible_user_dir }}/.wine-pfx/Fusion 360"
-  notify: Restart wine services
 
 - name: Create Fusion 360 desktop entry
   copy:
@@ -39,4 +38,3 @@
       Type=Application
       Categories=Graphics;3DGraphics;CAD;
     mode: '0644'
-  when: false

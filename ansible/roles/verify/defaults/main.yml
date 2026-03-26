@@ -1,0 +1,4 @@
+---
+mount_games: /mnt/games
+mount_storage: /mnt/storage
+mount_backups: /mnt/backups

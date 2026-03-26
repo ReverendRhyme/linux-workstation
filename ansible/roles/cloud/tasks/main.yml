@@ -9,7 +9,7 @@
 
 - name: Ensure Google Drive mount directory exists
   ansible.builtin.file:
-    path: "/home/{{ ansible_user_id }}/GoogleDrive"
+    path: "{{ cloud_gdrive_mount }}"
     state: directory
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"

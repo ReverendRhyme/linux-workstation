@@ -1,25 +1,25 @@
 ---
 - name: Ensure game mount directory exists
   ansible.builtin.file:
-    path: "{{ mount_games | default('/mnt/games') }}"
+    path: "{{ mount_games }}"
     state: directory
     mode: '0755'
 
 - name: Ensure storage mount directory exists
   ansible.builtin.file:
-    path: "{{ mount_storage | default('/mnt/storage') }}"
+    path: "{{ mount_storage }}"
     state: directory
     mode: '0755'
 
 - name: Ensure backups mount directory exists
   ansible.builtin.file:
-    path: "{{ mount_backups | default('/mnt/backups') }}"
+    path: "{{ mount_backups }}"
     state: directory
     mode: '0755'
 
 - name: Show storage mount targets
   ansible.builtin.debug:
     msg:
-      - "games: {{ mount_games | default('/mnt/games') }}"
-      - "storage: {{ mount_storage | default('/mnt/storage') }}"
-      - "backups: {{ mount_backups | default('/mnt/backups') }}"
+      - "games: {{ mount_games }}"
+      - "storage: {{ mount_storage }}"
+      - "backups: {{ mount_backups }}"

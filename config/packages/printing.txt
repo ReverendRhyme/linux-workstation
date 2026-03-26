@@ -1,5 +1,0 @@
-# 3D Printing packages
-
-# Native slicers
-prusaslicer
-cura

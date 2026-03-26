@@ -1,0 +1,2 @@
+---
+cloud_gdrive_mount: "{{ ansible_user_dir }}/GoogleDrive"

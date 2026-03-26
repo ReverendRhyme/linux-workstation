@@ -56,11 +56,6 @@
       - libreoffice-gnome
     state: present
 
-- name: Install rclone (cloud sync)
-  apt:
-    name: rclone
-    state: present
-
 - name: Install FileZilla (FTP client)
   apt:
     name: filezilla

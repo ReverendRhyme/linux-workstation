@@ -21,5 +21,8 @@
       tags: [cloud]
     - role: desktop
       tags: [desktop]
+    - role: fusion360
+      tags: [fusion360]
+      when: use_fusion360 | default(false) | bool
     - role: verify
       tags: [verify]
