@@ -35,4 +35,4 @@ pre-commit run --all-files
 
 ## Legacy Scripts
 
-The repository is Ansible-first. Legacy helper scripts under `scripts/modules/` and older validation helpers are retained for reference/migration only unless explicitly called out in an issue.
+The repository is Ansible-first. Legacy helper scripts under `legacy/modules/` and legacy shared helpers under `legacy/core/` are retained for reference/migration only unless explicitly called out in an issue.

@@ -90,6 +90,8 @@ Use the generated JSON report to make deployment decisions:
 | **Cloud** | rclone |
 | **Utilities** | btop, ncdu, bat, fzf, FileZilla |
 
+Package/source-of-truth note: role task files under `ansible/roles/*/tasks/main.yml` define installed software.
+
 ---
 
 ## COSMIC Desktop
@@ -274,6 +276,9 @@ linux-workstation/
 │   ├── cloud-setup.sh       # Google Drive/OneDrive
 │   ├── mount-drives.sh      # Drive mount helper
 │   └── post-install-check.sh # Verification
+├── legacy/
+│   ├── core/                # Legacy shared bash libraries
+│   └── modules/             # Legacy module installers
 ├── ansible/
 │   ├── site.yml             # Main playbook
 │   └── roles/              # Modular roles

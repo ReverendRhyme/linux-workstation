@@ -128,7 +128,7 @@ linux-workstation/
 ├── config/
 │   ├── defaults.env       # Portable defaults (tracked)
 │   ├── deployment.local.env  # Local overrides (gitignored)
-│   └── packages/          # Package lists by category
+│   └── deployment.local.env.example # Local override template
 ├── bootstrap/
 │   └── bootstrap.sh       # Main entry point (installs Ansible, runs playbook)
 ├── ansible/
@@ -153,6 +153,9 @@ linux-workstation/
 │   ├── drive-recommend.sh # Drive detection + recommendations
 │   ├── mount-drives.sh    # Mount helper
 │   └── maintenance.sh     # System updates
+├── legacy/
+│   ├── core/              # Legacy shared bash libraries
+│   └── modules/           # Legacy per-category installer scripts
 ├── configs/
 │   ├── fstab.example      # Template for /etc/fstab
 │   ├── zshrc.example      # ZSH configuration
@@ -177,6 +180,8 @@ linux-workstation/
 | OBS Studio | Streaming/recording |
 | Discord | Voice chat |
 
+Package source of truth: `ansible/roles/gaming/tasks/main.yml`.
+
 ### Development Tools
 | App | Purpose |
 |-----|---------|
@@ -185,6 +190,8 @@ linux-workstation/
 | Git | Version control |
 | Python 3 | Scripting |
 | VS Code / Cursor | IDE |
+
+Package source of truth: `ansible/roles/dev/tasks/main.yml`.
 
 ### CAD/3D Design
 | App | Purpose |
@@ -195,6 +202,8 @@ linux-workstation/
 | MeshLab | Mesh processing |
 | Fusion 360 | Full CAD via Wine (cryinkfly script) |
 
+Package source of truth: `ansible/roles/cad/tasks/main.yml` and `ansible/roles/fusion360/tasks/main.yml`.
+
 ### 3D Printing
 | App | Purpose |
 |-----|---------|
@@ -203,6 +212,8 @@ linux-workstation/
 | CHITUBOX | Resin printing slicer |
 | PrusaSlicer | Alternative slicer |
 | Cura | Ultimaker slicer |
+
+Package source of truth: `ansible/roles/printing/tasks/main.yml`.
 
 ### Productivity & Office
 | App | Purpose |
@@ -215,11 +226,15 @@ linux-workstation/
 | Spotify | Music streaming |
 | FileZilla | FTP/SFTP client |
 
+Package source of truth: `ansible/roles/base/tasks/main.yml`.
+
 ### Cloud Storage
 | App | Purpose |
 |-----|---------|
 | rclone | Google Drive/OneDrive sync |
 | Flatpak apps | Native cloud integration |
+
+Package source of truth: `ansible/roles/cloud/tasks/main.yml`.
 
 ### Mod Management
 | App | Purpose |
@@ -328,5 +343,5 @@ vulkan-smi
 
 ## Legacy Helpers
 
-- `scripts/modules/*` and `scripts/post-install-check.sh` are retained for compatibility/reference.
+- `legacy/modules/*`, `legacy/core/*`, and `scripts/post-install-check.sh` are retained for compatibility/reference.
 - Preferred verification path is `./scripts/full-setup.sh --verify` (Ansible role).

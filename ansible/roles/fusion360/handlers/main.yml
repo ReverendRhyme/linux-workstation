@@ -1,5 +1,0 @@
-- name: Restart wine services
-  systemd:
-    name: winbind
-    state: restarted
-  failed_when: false
