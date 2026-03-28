@@ -1,0 +1,42 @@
+name: Migration regression
+description: Report a Windows-to-Pop migration context regression.
+title: "migration regression: "
+labels:
+  - migration
+  - regression
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario
+      description: What migration flow were you running?
+      placeholder: Windows export -> branch commit -> Linux import -> popos-auto
+    validations:
+      required: true
+
+  - type: textarea
+    id: context_files
+    attributes:
+      label: Context files involved
+      description: Which files in migration/context were used?
+      placeholder: machine-profile.json, software-map.json, deployment.seed.env
+    validations:
+      required: true
+
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure details
+      description: Include command output and exact failure point.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety_checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I did not commit raw/sensitive migration data.
+          required: true
+        - label: I ran validate-migration-context and allowlist checks.
+          required: false

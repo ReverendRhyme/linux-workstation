@@ -1,0 +1,30 @@
+name: Smoke Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate shell script syntax
+        run: |
+          bash -n scripts/popos-auto.sh
+          bash -n scripts/full-setup.sh
+          bash -n scripts/agent-configure.sh
+          bash -n scripts/linux/import-migration-context.sh
+          bash -n scripts/linux/check-migration-allowlist.sh
+
+      - name: Validate migration context schema helper
+        run: |
+          python3 -m py_compile scripts/linux/validate-migration-context.py
+          python3 scripts/linux/validate-migration-context.py --all-contexts --context-root migration/context
+
+      - name: Run dry-run setup wrappers
+        run: |
+          ./scripts/full-setup.sh --all --dry-run
+          ./scripts/popos-auto.sh --dry-run
