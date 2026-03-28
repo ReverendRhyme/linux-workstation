@@ -18,6 +18,12 @@ For a concise command sequence, see `QUICKSTART.md`.
 powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
 ```
 
+For closed-loop QA automation on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+```
+
 2. Review generated files in `migration/context/<machine-id>/`.
 3. Commit only sanitized context files.
 4. On Pop!_OS, import context:
