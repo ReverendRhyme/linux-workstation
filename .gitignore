@@ -12,6 +12,15 @@ config/deployment.local.env
 .venv-lint/
 .venv-tools/
 .filter-repo-replacements.txt
+migration/raw/
+migration/context/**/raw/
+migration/context/**/sensitive/
+migration/context/**/*.zip
+migration/context/**/*.7z
+migration/context/**/*.sqlite
+migration/context/**/*.db
+migration/context/**/*.key
+migration/context/**/*.pem
 
 !.env.example
 !*.local.example

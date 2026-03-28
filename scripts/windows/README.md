@@ -1,13 +1,14 @@
-# Windows Backup Helper (Google Drive)
+# Windows Migration Helpers
 
-This helper creates a migration backup bundle in Google Drive before moving to Pop!_OS.
+These helpers collect backup data and migration context before moving to Pop!_OS.
 
 Default target root:
 - `S:\My Drive`
 
-## Script
+## Scripts
 
 - `scripts/windows/backup-to-gdrive.ps1`
+- `scripts/windows/export-migration-context.ps1`
 
 ## Quick start
 
@@ -18,6 +19,36 @@ powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 
 ```
 
 For best browser/bookmark consistency, close Chrome/Edge/Firefox/Brave before running.
+
+Export migration context (sanitized by default):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
+```
+
+This writes structured migration files to `migration/context/<machine-id>/` that can be committed and reused on Linux.
+
+Commit flow example:
+
+```powershell
+git checkout -b migration/windows/<machine-id>/<yyyymmdd>
+git add migration/context/<machine-id>
+git commit -m "Add sanitized Windows migration context."
+git push -u origin migration/windows/<machine-id>/<yyyymmdd>
+```
+
+On Linux, import and provision:
+
+```bash
+./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
+```
+
+The export includes:
+- machine profile + storage summary
+- software map with Linux install intent categories
+- drive/install intent hints (fresh vs dualboot)
+- deployment seed env for Linux import
 
 ## Optional arguments
 

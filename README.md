@@ -23,42 +23,30 @@ This repository is designed to be portable across most Pop!_OS-compatible hardwa
 
 ---
 
-## Quick Start (After Pop_OS! Installation)
+## Quick Start
+
+- Fastest end-to-end path (Windows export + Linux import + provisioning): `QUICKSTART.md`
+- Full walkthrough with detailed explanations: `SETUP_GUIDE.md`
+- AI-agent behavior and automation contract: `AGENTS.md`
+
+Core commands after Pop!_OS install:
 
 ```bash
-# 1. Clone this repo (or your fork)
+# Clone this repo (or your fork)
 git clone <your-fork-url>
 cd <repo-directory>
 
-# 2. Generate hardware report (for AI decisions)
-./scripts/hardware-report.sh
-# or share-safe output
-./scripts/hardware-report.sh --sanitize
-
-# 3. Run guided configuration (recommended)
-./scripts/agent-configure.sh --guided
-# or seed local overrides from template
-cp ./config/deployment.local.env.example ./config/deployment.local.env
-
-# 4. Provision selected profile
-source ./config/defaults.env
-test -f ./config/deployment.local.env && source ./config/deployment.local.env
-./scripts/full-setup.sh --profile "${DEPLOY_PROFILE:-full}"
-
-# 5. Verify with Ansible checks
-./scripts/full-setup.sh --verify
-
-# 6. (Optional) Manual drive helper for fstab review
-./scripts/mount-drives.sh
-
-# One-command wrapper (does guided + provision + verify)
+# One-command guided setup
 ./scripts/popos-auto.sh
 
-# Non-interactive automation (CI/remote provisioning)
+# Non-interactive setup
 ./scripts/popos-auto.sh --non-interactive --preset dual-disk
+
+# Migration-context-aware setup
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
 ```
 
-Preset options for non-interactive mode:
+Preset options:
 - `single-disk` - single-drive systems, full profile
 - `dual-disk` - gaming-focused dual-drive systems
 - `dual-boot` - dual-boot install mode with gaming profile
@@ -77,6 +65,13 @@ Preset options for non-interactive mode:
 - CI runs secret scanning automatically via Gitleaks (`.github/workflows/secret-scan.yml`).
 
 ---
+
+## Windows -> Linux Context Flow
+
+Use `QUICKSTART.md` for the canonical command sequence.
+
+Detailed migration policy (allowlist, safety rules, and AI-agent contract):
+- `migration/README.md`
 
 ## Migration Checklist
 
@@ -158,7 +153,13 @@ linux-workstation/
 │   ├── post-install-check.sh # Legacy deep-check helper
 │   ├── drive-recommend.sh # Drive detection + recommendations
 │   ├── mount-drives.sh    # Mount helper
-│   └── maintenance.sh     # System updates
+│   ├── maintenance.sh     # System updates
+│   ├── linux/             # Linux migration import + policy checks
+│   └── windows/           # Windows backup + migration export helpers
+├── migration/
+│   ├── README.md          # Migration branch workflow + safety
+│   ├── schema/            # JSON schemas for migration context
+│   └── context/           # Machine-specific sanitized migration data
 ├── legacy/
 │   ├── core/              # Legacy shared bash libraries
 │   └── modules/           # Legacy per-category installer scripts

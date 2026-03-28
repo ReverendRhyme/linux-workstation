@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "paths.schema.json",
+  "type": "object",
+  "required": ["generated_at", "backup_root", "steam_libraries", "browser_profiles", "dev_paths"],
+  "properties": {
+    "generated_at": { "type": "string" },
+    "backup_root": { "type": "string" },
+    "install_mode": { "type": "string", "enum": ["fresh", "dualboot", "existing-pop"] },
+    "system_drive": { "type": "string" },
+    "logical_drives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["letter", "size_gb", "free_gb"],
+        "properties": {
+          "letter": { "type": "string" },
+          "label": { "type": "string" },
+          "fs": { "type": "string" },
+          "size_gb": { "type": "number" },
+          "free_gb": { "type": "number" }
+        }
+      }
+    },
+    "steam_libraries": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "browser_profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path"],
+        "properties": {
+          "name": { "type": "string" },
+          "path": { "type": "string" }
+        }
+      }
+    },
+    "dev_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -24,3 +24,9 @@ jobs:
 
       - name: Run yamllint
         run: yamllint .
+
+      - name: Enforce migration context allowlist
+        run: ./scripts/linux/check-migration-allowlist.sh --all
+
+      - name: Validate sample migration context
+        run: python3 scripts/linux/validate-migration-context.py --all-contexts --context-root migration/context

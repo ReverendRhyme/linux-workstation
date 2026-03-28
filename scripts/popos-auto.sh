@@ -13,6 +13,7 @@ PROFILE_OVERRIDE=""
 NON_INTERACTIVE=0
 PRESET=""
 GENERATE_FSTAB=0
+MIGRATION_CONTEXT=""
 
 usage() {
     cat <<'EOF'
@@ -26,6 +27,7 @@ OPTIONS:
   --non-interactive  Generate config with no prompts
   --preset NAME    Preset for non-interactive config (single-disk|dual-disk|dual-boot)
   --generate-fstab Generate fstab proposal when writing config
+  --migration-context PATH  Import Windows migration context before setup
   --no-verify      Skip Ansible verification role at the end
   --dry-run        Show plan and run setup preview only
   -h, --help       Show this help
@@ -35,8 +37,18 @@ Examples:
   ./scripts/popos-auto.sh --profile gaming
   ./scripts/popos-auto.sh --skip-guided --profile dev
   ./scripts/popos-auto.sh --non-interactive --preset dual-disk
+  ./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
   ./scripts/popos-auto.sh --dry-run
 EOF
+}
+
+import_migration_context() {
+    local import_script="$REPO_DIR/scripts/linux/import-migration-context.sh"
+    if [[ ! -x "$import_script" ]]; then
+        echo "[ERROR] Missing migration import helper: $import_script" >&2
+        exit 1
+    fi
+    "$import_script" --context-dir "$MIGRATION_CONTEXT" --write-local-env --print-restore-plan
 }
 
 resolve_profile() {
@@ -109,6 +121,14 @@ main() {
             --generate-fstab)
                 GENERATE_FSTAB=1
                 ;;
+            --migration-context)
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "[ERROR] --migration-context requires a value" >&2
+                    exit 1
+                fi
+                MIGRATION_CONTEXT="$2"
+                shift
+                ;;
             --no-verify)
                 RUN_VERIFY=0
                 ;;
@@ -150,6 +170,10 @@ main() {
         echo "Would run post-install verification: $([[ $RUN_VERIFY -eq 1 ]] && echo yes || echo no)"
         echo ""
 
+        if [[ -n "$MIGRATION_CONTEXT" ]]; then
+            echo "Would run: ./scripts/linux/import-migration-context.sh --context-dir $MIGRATION_CONTEXT --write-local-env --print-restore-plan"
+        fi
+
         if [[ $SKIP_GUIDED -eq 0 && $NON_INTERACTIVE -eq 0 ]]; then
             echo "Would run: ./scripts/agent-configure.sh --guided"
         fi
@@ -172,6 +196,10 @@ main() {
 
         "$REPO_DIR/scripts/full-setup.sh" --profile "$preview_profile" --dry-run
         exit 0
+    fi
+
+    if [[ -n "$MIGRATION_CONTEXT" ]]; then
+        import_migration_context
     fi
 
     if [[ $SKIP_GUIDED -eq 0 && $NON_INTERACTIVE -eq 0 ]]; then

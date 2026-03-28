@@ -1,6 +1,6 @@
 param(
     [string]$GoogleDriveRoot = "S:\My Drive",
-    [string]$BackupName = "PRICK-Migration-$(Get-Date -Format 'yyyyMMdd-HHmmss')",
+    [string]$BackupName = "PopOS-Migration-$(Get-Date -Format 'yyyyMMdd-HHmmss')",
     [switch]$IncludeDownloads,
     [ValidateRange(1, 100)]
     [int]$HashSamplePercent = 5

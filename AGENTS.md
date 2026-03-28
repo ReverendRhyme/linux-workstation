@@ -9,6 +9,8 @@
 
 ## Quick Start for AI Agents
 
+For a concise command-only runbook, see `QUICKSTART.md`.
+
 When a user says "set up my Linux workstation" or "run the setup":
 
 ```bash
@@ -28,6 +30,37 @@ Skill shortcut:
 If drive layout or install mode is unclear, ask before changing mount or partition behavior.
 
 This wrapper runs: guided/non-interactive config -> profile provisioning -> verification.
+
+### Migration-Context-Aware Flow (Recommended)
+
+When helping with Windows -> Pop!_OS migration, use this two-phase flow:
+
+#### Phase A: Windows (collect + commit context)
+
+```powershell
+# From repo root on Windows
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
+
+# Review and commit sanitized context
+git checkout -b migration/windows/<machine-id>/<yyyymmdd>
+git add migration/context/<machine-id>
+git commit -m "Add sanitized Windows migration context."
+git push -u origin migration/windows/<machine-id>/<yyyymmdd>
+```
+
+#### Phase B: Linux (import + provision)
+
+```bash
+# From repo root on Pop!_OS
+./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
+```
+
+Agent behavior notes:
+- Prefer `--migration-context` when context exists.
+- If `GAMES_DRIVE` is empty and a Windows games-drive hint exists, prompt for Linux partition mapping.
+- Never auto-commit backup payloads or raw/sensitive migration data.
 
 ---
 
