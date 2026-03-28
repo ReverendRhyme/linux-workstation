@@ -1,0 +1,19 @@
+name: Fusion URL Guard
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Block archived Fusion installer URLs
+        run: |
+          if rg -n "raw\.githubusercontent\.com/cryinkfly/Autodesk-Fusion-360-for-Linux|Autodesk-Fusion-360-for-Linux/main/files/setup" --glob "*.md" --glob "*.sh" --glob "*.yml" --glob "*.ps1" .; then
+            echo "Archived Fusion installer URL detected. Use Codeberg provider URLs instead."
+            exit 1
+          fi

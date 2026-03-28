@@ -20,7 +20,7 @@ fi
 
 MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 REPO_NAME="${REPO_NAME:-linux-workstation}"
-REPO_URL="${REPO_URL:-https://github.com/<your-user>/<your-repo>.git}"
+REPO_URL="${REPO_URL:-https://github.com/your-user/your-repo.git}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
