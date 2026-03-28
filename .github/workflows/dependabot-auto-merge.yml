@@ -1,0 +1,26 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+jobs:
+  enable-auto-merge:
+    if: >-
+      github.event.pull_request.base.ref == 'main'
+      && github.event.pull_request.draft == false
+      && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Enable auto-merge for Dependabot PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr merge "$PR_URL" --auto --squash --delete-branch || {
+            echo "Auto-merge enable failed (possibly already enabled)."
+            gh pr view "$PR_URL" --json autoMergeRequest
+          }
