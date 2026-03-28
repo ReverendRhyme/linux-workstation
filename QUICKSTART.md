@@ -49,6 +49,11 @@ Then import context and provision:
 ./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
 ```
 
+If Fusion 360 is required, confirm `config/deployment.local.env` contains:
+- `USE_FUSION360=yes`
+- `FUSION360_PROVIDER=codeberg-script`
+- `FUSION360_FALLBACK_PROVIDER=bottles`
+
 If `GAMES_DRIVE` is blank and a Windows games-drive hint exists, the importer prompts for Linux partition mapping.
 
 ## 4) Validate migration artifacts (optional)

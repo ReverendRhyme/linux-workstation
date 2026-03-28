@@ -45,6 +45,11 @@ MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
 MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
 USE_FUSION360="${USE_FUSION360:-no}"
+FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
+FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
+FUSION360_CHANNEL="${FUSION360_CHANNEL:-stable}"
+FUSION360_ENABLE_PROTON="${FUSION360_ENABLE_PROTON:-no}"
+FUSION360_PROTON_VERSION="${FUSION360_PROTON_VERSION:-GE-Proton10-32}"
 
 # Colors
 RED='\033[0;31m'
@@ -222,13 +227,19 @@ run_bootstrap() {
     local ansible_tags
     ansible_tags="$(profile_to_ansible_tags "$profile")"
     local fusion360_bool="false"
+    local fusion360_proton_bool="false"
     case "${USE_FUSION360,,}" in
         1|true|yes|on)
             fusion360_bool="true"
             ;;
     esac
+    case "${FUSION360_ENABLE_PROTON,,}" in
+        1|true|yes|on)
+            fusion360_proton_bool="true"
+            ;;
+    esac
     local extra_vars
-    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool"
+    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER fusion360_fallback_provider=$FUSION360_FALLBACK_PROVIDER fusion360_channel=$FUSION360_CHANNEL fusion360_enable_proton=$fusion360_proton_bool fusion360_proton_version=$FUSION360_PROTON_VERSION"
 
     header "Step 1: Ansible Bootstrap"
     
@@ -269,7 +280,13 @@ run_bootstrap() {
 
 run_verify_ansible() {
     local extra_vars
-    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS"
+    local fusion360_bool="false"
+    case "${USE_FUSION360,,}" in
+        1|true|yes|on)
+            fusion360_bool="true"
+            ;;
+    esac
+    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER"
 
     header "Verification"
     log "Running Ansible verification role"

@@ -331,14 +331,14 @@ mangohud gamemoderun %command%
 Fusion 360 can run on Linux via Wine!
 
 #### Option A: Native Fusion 360 via Wine (Recommended)
-Using cryinkfly's installer script, Fusion 360 runs natively on Linux!
+Using the maintained Codeberg installer script, Fusion 360 runs natively on Linux.
 
 ```bash
 # Install dependencies
 sudo apt install wine wine64 winetricks p7zip-full curl wget cabextract
 
 # Download and run installer
-curl -L https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/setup/autodesk_fusion_installer_x86-64.sh -o fusion_installer.sh
+curl -L https://codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux/raw/branch/main/files/setup/autodesk_fusion_installer_x86-64.sh -o fusion_installer.sh
 chmod +x fusion_installer.sh
 ./fusion_installer.sh --install --default
 ```
@@ -353,7 +353,10 @@ chmod +x fusion_installer.sh
 - Verify your GPU meets Autodesk/Wine requirements
 - ~5GB disk space
 
-**Note:** Project moved to Codeberg: https://codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux
+**Automation defaults in this repo:**
+- `FUSION360_PROVIDER=codeberg-script`
+- `FUSION360_FALLBACK_PROVIDER=bottles`
+- `FUSION360_ENABLE_PROTON=no` (enable only when needed for your hardware/runtime)
 
 #### Option B: Fusion 360 Web (Free)
 - https://fusion.cloud.autodesk.com

@@ -79,3 +79,48 @@
     fail_msg: "Docker service is not running"
     success_msg: "Docker service is running"
   failed_when: false
+
+- name: Resolve Fusion 360 verify provider
+  ansible.builtin.set_fact:
+    verify_fusion_provider: "{{ fusion360_provider | default('codeberg-script') }}"
+    verify_fusion_user_home: "{{ lookup('env', 'HOME') }}"
+    verify_fusion_binary_path: "{{ fusion360_binary_path | default((lookup('env', 'HOME') ~ '/.autodesk_fusion/bin/fusion360')) }}"
+  when: use_fusion360 | default(false) | bool
+
+- name: Check Fusion 360 native binary for codeberg-script provider
+  ansible.builtin.stat:
+    path: "{{ verify_fusion_binary_path }}"
+  register: verify_fusion_binary
+  when:
+    - use_fusion360 | default(false) | bool
+    - verify_fusion_provider == 'codeberg-script'
+
+- name: Assert Fusion 360 native binary exists
+  ansible.builtin.assert:
+    that: verify_fusion_binary.stat.exists
+    fail_msg: >-
+      Fusion 360 required but native binary missing at {{ verify_fusion_binary_path }}.
+      Try setting fusion360_fallback_provider=bottles or rerun with fusion360_enable_proton=true.
+    success_msg: "Fusion 360 native binary detected"
+  when:
+    - use_fusion360 | default(false) | bool
+    - verify_fusion_provider == 'codeberg-script'
+
+- name: Verify Bottles is installed for Fusion 360 bottles provider
+  ansible.builtin.command:
+    cmd: flatpak info com.usebottles.bottles
+  register: verify_bottles
+  changed_when: false
+  failed_when: false
+  when:
+    - use_fusion360 | default(false) | bool
+    - verify_fusion_provider == 'bottles'
+
+- name: Assert Bottles is available for Fusion 360 fallback
+  ansible.builtin.assert:
+    that: verify_bottles.rc == 0
+    fail_msg: "Fusion 360 bottles provider selected, but Bottles is not installed"
+    success_msg: "Bottles provider is installed for Fusion 360"
+  when:
+    - use_fusion360 | default(false) | bool
+    - verify_fusion_provider == 'bottles'

@@ -23,6 +23,11 @@ MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
 DEPLOY_PROFILE="${DEPLOY_PROFILE:-full}"
 INSTALL_MODE="${INSTALL_MODE:-fresh}"
 USE_FUSION360="${USE_FUSION360:-no}"
+FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
+FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
+FUSION360_CHANNEL="${FUSION360_CHANNEL:-stable}"
+FUSION360_ENABLE_PROTON="${FUSION360_ENABLE_PROTON:-no}"
+FUSION360_PROTON_VERSION="${FUSION360_PROTON_VERSION:-GE-Proton10-32}"
 ENABLE_CLOUD_SETUP="${ENABLE_CLOUD_SETUP:-no}"
 
 mkdir -p "$CONFIG_DIR" "$LOG_DIR"
@@ -186,6 +191,11 @@ run_guided() {
     prompt_default "MOUNT_STORAGE" "Storage mount point" "$MOUNT_STORAGE"
     prompt_default "MOUNT_BACKUPS" "Backup mount point" "$MOUNT_BACKUPS"
     prompt_default "USE_FUSION360" "Install Fusion 360 via Wine? (yes|no)" "$USE_FUSION360"
+    prompt_default "FUSION360_PROVIDER" "Fusion 360 provider (codeberg-script|bottles|web|vm)" "$FUSION360_PROVIDER"
+    prompt_default "FUSION360_FALLBACK_PROVIDER" "Fusion 360 fallback provider (bottles|web|vm|none)" "$FUSION360_FALLBACK_PROVIDER"
+    prompt_default "FUSION360_CHANNEL" "Fusion 360 channel (stable|dev)" "$FUSION360_CHANNEL"
+    prompt_default "FUSION360_ENABLE_PROTON" "Use Proton mode for Fusion 360 installer? (yes|no)" "$FUSION360_ENABLE_PROTON"
+    prompt_default "FUSION360_PROTON_VERSION" "Fusion 360 Proton version (when enabled)" "$FUSION360_PROTON_VERSION"
     prompt_default "ENABLE_CLOUD_SETUP" "Configure cloud sync now? (yes|no)" "$ENABLE_CLOUD_SETUP"
 
     if [[ $GENERATE_FSTAB -eq 1 ]]; then
@@ -218,7 +228,8 @@ run_guided() {
 run_non_interactive() {
     local existing_profile existing_install existing_os existing_games existing_storage existing_backup
     local existing_mount_games existing_mount_storage existing_mount_backups
-    local existing_fusion existing_cloud
+    local existing_fusion existing_fusion_provider existing_fusion_fallback existing_fusion_channel
+    local existing_fusion_proton existing_fusion_proton_version existing_cloud
 
     existing_profile="$(read_saved_value "DEPLOY_PROFILE")"
     existing_install="$(read_saved_value "INSTALL_MODE")"
@@ -230,6 +241,11 @@ run_non_interactive() {
     existing_mount_storage="$(read_saved_value "MOUNT_STORAGE")"
     existing_mount_backups="$(read_saved_value "MOUNT_BACKUPS")"
     existing_fusion="$(read_saved_value "USE_FUSION360")"
+    existing_fusion_provider="$(read_saved_value "FUSION360_PROVIDER")"
+    existing_fusion_fallback="$(read_saved_value "FUSION360_FALLBACK_PROVIDER")"
+    existing_fusion_channel="$(read_saved_value "FUSION360_CHANNEL")"
+    existing_fusion_proton="$(read_saved_value "FUSION360_ENABLE_PROTON")"
+    existing_fusion_proton_version="$(read_saved_value "FUSION360_PROTON_VERSION")"
     existing_cloud="$(read_saved_value "ENABLE_CLOUD_SETUP")"
 
     apply_preset "$PRESET"
@@ -244,6 +260,11 @@ run_non_interactive() {
     MOUNT_STORAGE="${MOUNT_STORAGE:-$existing_mount_storage}"
     MOUNT_BACKUPS="${MOUNT_BACKUPS:-$existing_mount_backups}"
     USE_FUSION360="${USE_FUSION360:-$existing_fusion}"
+    FUSION360_PROVIDER="${FUSION360_PROVIDER:-$existing_fusion_provider}"
+    FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-$existing_fusion_fallback}"
+    FUSION360_CHANNEL="${FUSION360_CHANNEL:-$existing_fusion_channel}"
+    FUSION360_ENABLE_PROTON="${FUSION360_ENABLE_PROTON:-$existing_fusion_proton}"
+    FUSION360_PROTON_VERSION="${FUSION360_PROTON_VERSION:-$existing_fusion_proton_version}"
     ENABLE_CLOUD_SETUP="${ENABLE_CLOUD_SETUP:-$existing_cloud}"
 
     DEPLOY_PROFILE="${DEPLOY_PROFILE:-full}"
@@ -252,6 +273,11 @@ run_non_interactive() {
     MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
     MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
     USE_FUSION360="${USE_FUSION360:-no}"
+    FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
+    FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
+    FUSION360_CHANNEL="${FUSION360_CHANNEL:-stable}"
+    FUSION360_ENABLE_PROTON="${FUSION360_ENABLE_PROTON:-no}"
+    FUSION360_PROTON_VERSION="${FUSION360_PROTON_VERSION:-GE-Proton10-32}"
     ENABLE_CLOUD_SETUP="${ENABLE_CLOUD_SETUP:-no}"
 
     mkdir -p "$CONFIG_DIR" "$LOG_DIR"
@@ -267,6 +293,11 @@ run_non_interactive() {
     write_config_value "MOUNT_STORAGE" "$MOUNT_STORAGE"
     write_config_value "MOUNT_BACKUPS" "$MOUNT_BACKUPS"
     write_config_value "USE_FUSION360" "$USE_FUSION360"
+    write_config_value "FUSION360_PROVIDER" "$FUSION360_PROVIDER"
+    write_config_value "FUSION360_FALLBACK_PROVIDER" "$FUSION360_FALLBACK_PROVIDER"
+    write_config_value "FUSION360_CHANNEL" "$FUSION360_CHANNEL"
+    write_config_value "FUSION360_ENABLE_PROTON" "$FUSION360_ENABLE_PROTON"
+    write_config_value "FUSION360_PROTON_VERSION" "$FUSION360_PROTON_VERSION"
     write_config_value "ENABLE_CLOUD_SETUP" "$ENABLE_CLOUD_SETUP"
 
     if [[ $GENERATE_FSTAB -eq 1 ]]; then

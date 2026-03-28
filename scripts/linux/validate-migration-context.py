@@ -54,7 +54,20 @@ def validate_context(context_dir: Path):
         k, v = line.split("=", 1)
         seed[k.strip()] = v.strip()
 
-    for req in ["DEPLOY_PROFILE", "INSTALL_MODE", "MOUNT_GAMES", "MOUNT_STORAGE", "MOUNT_BACKUPS", "USE_FUSION360", "ENABLE_CLOUD_SETUP"]:
+    for req in [
+        "DEPLOY_PROFILE",
+        "INSTALL_MODE",
+        "MOUNT_GAMES",
+        "MOUNT_STORAGE",
+        "MOUNT_BACKUPS",
+        "USE_FUSION360",
+        "FUSION360_PROVIDER",
+        "FUSION360_FALLBACK_PROVIDER",
+        "FUSION360_CHANNEL",
+        "FUSION360_ENABLE_PROTON",
+        "FUSION360_PROTON_VERSION",
+        "ENABLE_CLOUD_SETUP",
+    ]:
         if req not in seed:
             raise ValueError(f"deployment.seed.env missing key: {req}")
 

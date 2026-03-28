@@ -206,15 +206,20 @@ sudo nano /etc/fstab
 
 ## Fusion 360 Setup
 
-Fusion 360 runs via Wine using cryinkfly's script:
+Fusion 360 native install uses the maintained Codeberg installer provider:
 
 ```bash
-curl -L https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/setup/autodesk_fusion_installer_x86-64.sh -o fusion_installer.sh
+curl -L https://codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux/raw/branch/main/files/setup/autodesk_fusion_installer_x86-64.sh -o fusion_installer.sh
 chmod +x fusion_installer.sh
 ./fusion_installer.sh --install --default
 ```
 
 Requires active Fusion 360 license.
+
+Automation notes:
+- `FUSION360_PROVIDER=codeberg-script` is the primary path.
+- `FUSION360_FALLBACK_PROVIDER=bottles` is the recommended fallback.
+- Avoid silent downgrade to web when Fusion is required.
 
 ---
 

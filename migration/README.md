@@ -34,6 +34,7 @@ When automating this flow with an AI agent:
 - Prefer these exact commands for export/import.
 - Use `--migration-context` whenever context exists.
 - Prompt only for Linux partition mapping when Windows drive hints cannot be mapped safely.
+- When Fusion 360 is required, prefer `FUSION360_PROVIDER=codeberg-script` with `FUSION360_FALLBACK_PROVIDER=bottles`.
 - Never commit backup payloads, raw exports, or sensitive data.
 - Never auto-push destructive git history changes.
 

@@ -1,0 +1,41 @@
+- name: Ensure Flatpak is installed for Bottles provider
+  ansible.builtin.apt:
+    name: flatpak
+    state: present
+
+- name: Ensure Flathub remote exists for Bottles provider
+  ansible.builtin.command:
+    cmd: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  changed_when: false
+
+- name: Install Bottles for Fusion 360 fallback
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub com.usebottles.bottles
+  register: fusion360_bottles_install
+  changed_when: >-
+    'Installing' in (fusion360_bottles_install.stdout | default(''))
+    or 'installing' in (fusion360_bottles_install.stdout | default(''))
+  failed_when: false
+
+- name: Create Fusion 360 Bottles helper desktop entry
+  ansible.builtin.copy:
+    dest: "{{ fusion360_user_home }}/.local/share/applications/fusion360-bottles.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Name=Autodesk Fusion 360 (Bottles)
+      Comment=Launch Bottles to run Autodesk Fusion 360
+      Exec=flatpak run com.usebottles.bottles
+      Icon=com.usebottles.bottles
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;CAD;
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+
+- name: Report Bottles manual follow-up
+  ansible.builtin.debug:
+    msg: >-
+      Bottles installed. Complete Fusion 360 setup inside Bottles if native Codeberg-script install fails.
