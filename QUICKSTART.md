@@ -13,6 +13,12 @@ powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 
 powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
 ```
 
+Or run the closed-loop helper:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+```
+
 This creates sanitized context in `migration/context/<machine-id>/`.
 
 Find your generated machine ID:

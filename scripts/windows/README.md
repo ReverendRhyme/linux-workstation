@@ -9,6 +9,7 @@ Default target root:
 
 - `scripts/windows/backup-to-gdrive.ps1`
 - `scripts/windows/export-migration-context.ps1`
+- `scripts/windows/run-migration-test-loop.ps1`
 
 ## Quick start
 
@@ -43,6 +44,16 @@ On Linux, import and provision:
 ./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
 ./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
 ```
+
+Run the closed-loop migration QA helper (backup + export + validation + incident note on failure):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+```
+
+Optional:
+- `-SkipBackup` to only run export + validation
+- `-PrepareFixBranch` to auto-create `fix/migration-loop/<yyyymmdd>-<topic>` when blocked
 
 The export includes:
 - machine profile + storage summary

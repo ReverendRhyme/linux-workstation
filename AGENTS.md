@@ -62,6 +62,39 @@ Agent behavior notes:
 - If `GAMES_DRIVE` is empty and a Windows games-drive hint exists, prompt for Linux partition mapping.
 - Never auto-commit backup payloads or raw/sensitive migration data.
 
+### Command-Triggered Migration QA Loop
+
+Use a strict trigger phrase so behavior is deterministic.
+
+Primary trigger:
+- `run windows migration test loop`
+
+Accepted aliases:
+- `run migration qa loop`
+- `retest windows migration flow`
+
+When triggered, execute this closed-loop workflow:
+1. Run Phase A Windows commands via helper script:
+   - `powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads`
+   - (or manually run `backup-to-gdrive.ps1` then `export-migration-context.ps1`)
+2. Validate generated context (`deployment.seed.env`, required JSON files).
+3. If a failure occurs, stop normal flow and:
+   - capture failing command, exit code, and key stderr/stdout lines
+   - classify root cause (`script`, `path`, `permissions`, `network`, `schema`, `git`)
+   - document findings in a concise incident note in `migration/context/<machine-id>/summary.md` (append section)
+4. Hand back to AI repair cycle:
+   - create fix branch `fix/migration-loop/<yyyymmdd>-<short-topic>`
+   - implement minimal fix
+   - run validation commands
+   - open PR with failure evidence + fix summary
+5. After PR merge, rerun trigger flow and report final status (`PASS` or `BLOCKED`).
+
+Automation constraints for this loop:
+- Commit only sanitized context files under `migration/context/<machine-id>/`.
+- Never commit backup payload directories or raw/sensitive exports.
+- Never use destructive git commands unless explicitly requested.
+- Only ask user questions when blocked by missing required values (credentials, ambiguous target disk mapping, etc.).
+
 ---
 
 ## Purpose
