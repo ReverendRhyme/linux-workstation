@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-03-27T18:00:00Z",
+  "apps": [
+    {
+      "name": "Steam",
+      "version": "sample",
+      "publisher": "Valve",
+      "category": "gaming",
+      "linux_target": "native",
+      "install_method": "ansible",
+      "notes": "Expected from gaming/base roles"
+    },
+    {
+      "name": "Docker Desktop",
+      "version": "sample",
+      "publisher": "Docker",
+      "category": "dev",
+      "linux_target": "native",
+      "install_method": "ansible",
+      "notes": "Expected from dev/base roles"
+    },
+    {
+      "name": "Autodesk Fusion 360",
+      "version": "sample",
+      "publisher": "Autodesk",
+      "category": "cad",
+      "linux_target": "wine",
+      "install_method": "optional-fusion360",
+      "notes": "Enable USE_FUSION360=yes if needed"
+    }
+  ]
+}

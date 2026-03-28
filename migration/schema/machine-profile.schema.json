@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "machine-profile.schema.json",
+  "type": "object",
+  "required": [
+    "generated_at",
+    "machine_id",
+    "sanitized",
+    "os",
+    "cpu",
+    "memory_gb",
+    "storage"
+  ],
+  "properties": {
+    "generated_at": { "type": "string" },
+    "machine_id": { "type": "string" },
+    "sanitized": { "type": "boolean" },
+    "os": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "cpu": { "type": "string" },
+    "gpu": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "memory_gb": { "type": "number" },
+    "storage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["model", "size_gb", "bus_type"],
+        "properties": {
+          "model": { "type": "string" },
+          "size_gb": { "type": "number" },
+          "bus_type": { "type": "string" },
+          "media_type": { "type": "string" }
+        }
+      }
+    }
+  }
+}

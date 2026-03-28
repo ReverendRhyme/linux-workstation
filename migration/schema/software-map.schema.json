@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "software-map.schema.json",
+  "type": "object",
+  "required": ["generated_at", "apps"],
+  "properties": {
+    "generated_at": { "type": "string" },
+    "apps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "linux_target", "install_method"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "publisher": { "type": "string" },
+          "category": {
+            "type": "string",
+            "enum": ["gaming", "dev", "cad", "printing", "productivity", "vendor", "other"]
+          },
+          "linux_target": {
+            "type": "string",
+            "enum": ["native", "flatpak", "wine", "web", "manual", "skip"]
+          },
+          "install_method": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

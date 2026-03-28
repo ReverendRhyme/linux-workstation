@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-03-27T18:00:00Z",
+  "machine_id": "win-sample-devgamer",
+  "sanitized": true,
+  "os": {
+    "name": "Microsoft Windows 11 Pro",
+    "version": "10.0.22631"
+  },
+  "cpu": "redacted",
+  "gpu": [
+    "redacted"
+  ],
+  "memory_gb": 32,
+  "storage": [
+    {
+      "model": "redacted",
+      "size_gb": 1000,
+      "bus_type": "NVMe",
+      "media_type": "SSD"
+    },
+    {
+      "model": "redacted",
+      "size_gb": 2000,
+      "bus_type": "NVMe",
+      "media_type": "SSD"
+    }
+  ]
+}

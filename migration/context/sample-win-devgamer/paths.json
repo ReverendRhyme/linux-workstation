@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-03-27T18:00:00Z",
+  "backup_root": "<set-after-backup>",
+  "install_mode": "dualboot",
+  "system_drive": "C:\\",
+  "logical_drives": [
+    {
+      "letter": "C:\\",
+      "label": "Windows",
+      "fs": "NTFS",
+      "size_gb": 1000,
+      "free_gb": 420
+    },
+    {
+      "letter": "E:\\",
+      "label": "Games",
+      "fs": "NTFS",
+      "size_gb": 2000,
+      "free_gb": 1300
+    }
+  ],
+  "steam_libraries": [
+    "C:\\Program Files (x86)\\Steam\\steamapps",
+    "E:\\SteamLibrary\\steamapps"
+  ],
+  "browser_profiles": [
+    {
+      "name": "Chrome",
+      "path": "%LOCALAPPDATA%\\Google\\Chrome\\User Data"
+    },
+    {
+      "name": "Firefox",
+      "path": "%APPDATA%\\Mozilla\\Firefox\\Profiles"
+    }
+  ],
+  "dev_paths": [
+    "%USERPROFILE%\\.ssh",
+    "%APPDATA%\\Code\\User"
+  ]
+}

@@ -1,6 +1,8 @@
 # Pop_OS! Setup Guide
 
-Complete walkthrough for migrating from Windows 11 to Pop_OS! using this repo.
+Complete walkthrough for migrating from Windows to Pop!_OS using this repo.
+
+If you only need command-by-command execution, use `QUICKSTART.md`.
 
 ---
 
@@ -22,6 +24,36 @@ Complete walkthrough for migrating from Windows 11 to Pop_OS! using this repo.
 
 Complete these **before** installation day.
 
+### Automated Migration Context (Recommended)
+
+This section mirrors the command flow in `QUICKSTART.md` with added context.
+
+From repo root on Windows:
+
+```powershell
+# 1) Backup payload
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads
+
+# 2) Export sanitized migration context for Linux import
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
+```
+
+Then commit sanitized context files (repo or fork):
+
+```powershell
+git checkout -b migration/windows/<machine-id>/<yyyymmdd>
+git add migration/context/<machine-id>
+git commit -m "Add sanitized Windows migration context."
+git push -u origin migration/windows/<machine-id>/<yyyymmdd>
+```
+
+On Linux, import this context before provisioning:
+
+```bash
+./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
+```
+
 ### Data Backup
 ```bash
 # On Windows, backup:
@@ -41,7 +73,7 @@ Complete these **before** installation day.
   C:\Users\<your-username>\Documents
   ```
 - [ ] **Browser bookmarks** - Export from Chrome/Firefox
-- [ ] **VPN config** - PIA (Private Internet Access) has Linux client
+- [ ] **VPN config** - verify your VPN provider has a Linux client
 
 ### Software Equivalents (Linux)
 
@@ -59,7 +91,7 @@ Complete these **before** installation day.
 | PowerShell | PowerShell (native) |
 | Git | Git |
 | Autodesk AutoCAD | None (Windows only) |
-| ASUS Armoury Crate | Not needed (AMD GPU) |
+| Vendor hardware suites | Usually not required on Linux |
 | Malwarebytes | Not needed (Linux) |
 | Backblaze | Timeshift / Restic |
 
@@ -85,8 +117,8 @@ COSMIC is the new default desktop for Pop!_OS:
 
 ## 2. Installation Day
 
-For a dedicated `E:` SSD dual-boot path, use:
-- `docs/POP_OS_DUAL_BOOT_PLAN.md`
+For machine-specific dual-boot notes, see:
+- `docs/personal/POP_OS_DUAL_BOOT_PLAN.md`
 
 ### Boot from USB
 1. Insert USB
@@ -183,14 +215,25 @@ df -h /mnt/games
 sudo apt install -y git
 
 # Clone with HTTPS (or your fork)
-git clone https://github.com/ReverendRhyme/linux-workstation.git
-cd linux-workstation
+git clone <your-fork-url>
+cd <repo-directory>
+
+# Optional: import Windows migration context first
+./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
+
+# Or run one wrapper that imports + provisions + verifies
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
+```
+
+For unattended automation with known disk layout:
+
+```bash
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id> --non-interactive --preset dual-disk
 ```
 
 ### Run Bootstrap
 ```bash
-cd bootstrap
-./bootstrap.sh
+./bootstrap/bootstrap.sh
 ```
 
 This will:
@@ -307,7 +350,7 @@ chmod +x fusion_installer.sh
 
 **Requirements:**
 - Active Fusion 360 license (personal, education, or subscription)
-- AMD RX 580 is in the tested graphics cards list
+- Verify your GPU meets Autodesk/Wine requirements
 - ~5GB disk space
 
 **Note:** Project moved to Codeberg: https://codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux
@@ -470,10 +513,10 @@ Run this script to verify everything:
 ### Verify GPU
 ```bash
 glxinfo | grep "OpenGL renderer"
-# Expected: AMD Radeon RX 580 (Mesa)
+# Expected: your active GPU renderer
 
-vulkan-smoke
-# Should show GPU info
+vulkaninfo --summary
+# Should print Vulkan adapter details
 ```
 
 ### Verify Gaming Stack
@@ -664,7 +707,7 @@ sudo apt install lutris
 ```
 
 **Supported games on Linux:**
-- Baldur's Gate 3 (your install!)
+- Any game supported by your selected Proton/Wine stack
 - Skyrim (via Proton)
 - Fallout 4 (via Proton)
 - Most Nexus Mods games

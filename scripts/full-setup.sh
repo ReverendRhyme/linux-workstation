@@ -44,6 +44,7 @@ fi
 MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
 MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
+USE_FUSION360="${USE_FUSION360:-no}"
 
 # Colors
 RED='\033[0;31m'
@@ -220,8 +221,14 @@ run_bootstrap() {
     local profile="${1:-full}"
     local ansible_tags
     ansible_tags="$(profile_to_ansible_tags "$profile")"
+    local fusion360_bool="false"
+    case "${USE_FUSION360,,}" in
+        1|true|yes|on)
+            fusion360_bool="true"
+            ;;
+    esac
     local extra_vars
-    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS"
+    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool"
 
     header "Step 1: Ansible Bootstrap"
     

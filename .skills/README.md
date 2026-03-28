@@ -1,6 +1,6 @@
 # OpenCode Skills
 
-Custom skills for provisioning Kevin's Linux workstation.
+Custom skills for provisioning a Linux workstation from this repository.
 
 ## Available Skills
 
@@ -102,10 +102,10 @@ test -f ./config/deployment.local.env && source ./config/deployment.local.env
 
 Before running any skill:
 1. Pop!_OS with COSMIC installed
-2. Clone this repo: `git clone https://github.com/ReverendRhyme/linux-workstation.git`
+2. Clone this repo: `git clone <your-fork-url>`
 3. Have sudo access
 4. Internet connection
 
 ## Repository
 
-https://github.com/ReverendRhyme/linux-workstation
+<your-repository-url>

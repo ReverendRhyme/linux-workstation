@@ -25,6 +25,9 @@ NC='\033[0m'
 
 DRIVES=()
 RECOMMENDATIONS=()
+MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
+MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
+MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
 
 log() { echo -e "${GREEN}[+]${NC} $1"; }
 info() { echo -e "${BLUE}[i]${NC} $1"; }
@@ -357,9 +360,9 @@ make_recommendations() {
     echo "Storage:    $storage_drive"
     echo ""
     echo "Mount Points:"
-    echo "  /mnt/games    - Games library (990 PRO)"
-    echo "  /mnt/software - Software installs (SATA SSD/RAID)"
-    echo "  /mnt/storage  - Bulk storage (HDD)"
+    echo "  $MOUNT_GAMES   - Games library"
+    echo "  $MOUNT_STORAGE - General storage"
+    echo "  $MOUNT_BACKUPS - Backups/archive"
     echo ""
     
     # Store recommendations globally
@@ -381,33 +384,33 @@ plan_partitions() {
     echo -e "${CYAN}Recommended Partition Layout:${NC}"
     echo ""
     
-    echo "Drive 1 - OS (1TB NVMe):"
+    echo "OS Drive (example layout):"
     echo "  Device: $REC_OS_DRIVE"
     echo "  ├── /boot/efi   512MB  EFI System Partition"
     echo "  ├── /           200GB  Root (ext4)"
     echo "  ├── /home       300GB  Home (ext4)"
-    echo "  └── /mnt/storage  500GB  Projects/Documents (ext4)"
+    echo "  └── $MOUNT_STORAGE  remaining space  Data/projects (ext4)"
     echo ""
     
-    echo "Drive 2 - GAMES (2TB NVMe):"
+    echo "Games Drive (optional):"
     echo "  Device: $REC_GAME_DRIVE"
-    echo "  └── /mnt/games  entire drive (ext4)"
+    echo "  └── $MOUNT_GAMES  selected partition or entire drive (ext4)"
     echo "      - Steam library"
     echo "      - GOG library"
     echo "      - Epic library"
     echo "      - Heroic downloads"
     echo ""
     
-    echo "Drive 3 - SOFTWARE (SATA SSD/RAID):"
-    echo "  Suggested mount: /mnt/software"
+    echo "Additional Storage (optional SSD/HDD/RAID):"
+    echo "  Suggested mount: $MOUNT_STORAGE"
     echo "  - Docker volumes"
     echo "  - Flatpak apps (alternative)"
     echo "  - Development projects"
     echo "  - Software builds"
     echo ""
     
-    echo "Drive 4+ - BULK STORAGE (HDD):"
-    echo "  Suggested mount: /mnt/backup"
+    echo "Backup Drive (optional):"
+    echo "  Suggested mount: $MOUNT_BACKUPS"
     echo "  - Archives"
     echo "  - Backups"
     echo "  - Media library"
@@ -428,15 +431,15 @@ show_fstab_examples() {
     echo ""
     
     echo "# Games drive (fastest NVMe)"
-    echo "# UUID=<uuid> /mnt/games ext4 defaults,nofail 0 2"
+    echo "# UUID=<uuid> $MOUNT_GAMES ext4 defaults,nofail 0 2"
     echo ""
     
-    echo "# Software installs (SATA SSD or RAID array)"
-    echo "# UUID=<uuid> /mnt/software ext4 defaults,nofail 0 2"
+    echo "# General storage"
+    echo "# UUID=<uuid> $MOUNT_STORAGE ext4 defaults,nofail 0 2"
     echo ""
     
-    echo "# Bulk storage (HDD)"
-    echo "# UUID=<uuid> /mnt/backup ext4 defaults,nofail 0 2"
+    echo "# Backup/archive storage"
+    echo "# UUID=<uuid> $MOUNT_BACKUPS ext4 defaults,nofail 0 2"
     echo ""
     
     echo "To find UUIDs after installation:"
@@ -444,7 +447,7 @@ show_fstab_examples() {
     echo ""
     
     echo "For RAID arrays, use /dev/mdX instead of UUID:"
-    echo "  /dev/md0 /mnt/software ext4 defaults,nofail 0 2"
+    echo "  /dev/md0 $MOUNT_STORAGE ext4 defaults,nofail 0 2"
 }
 
 ###############################################################################

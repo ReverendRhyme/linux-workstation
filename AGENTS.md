@@ -9,6 +9,8 @@
 
 ## Quick Start for AI Agents
 
+For a concise command-only runbook, see `QUICKSTART.md`.
+
 When a user says "set up my Linux workstation" or "run the setup":
 
 ```bash
@@ -29,6 +31,37 @@ If drive layout or install mode is unclear, ask before changing mount or partiti
 
 This wrapper runs: guided/non-interactive config -> profile provisioning -> verification.
 
+### Migration-Context-Aware Flow (Recommended)
+
+When helping with Windows -> Pop!_OS migration, use this two-phase flow:
+
+#### Phase A: Windows (collect + commit context)
+
+```powershell
+# From repo root on Windows
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
+
+# Review and commit sanitized context
+git checkout -b migration/windows/<machine-id>/<yyyymmdd>
+git add migration/context/<machine-id>
+git commit -m "Add sanitized Windows migration context."
+git push -u origin migration/windows/<machine-id>/<yyyymmdd>
+```
+
+#### Phase B: Linux (import + provision)
+
+```bash
+# From repo root on Pop!_OS
+./scripts/linux/import-migration-context.sh --context-dir migration/context/<machine-id> --write-local-env --print-restore-plan
+./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
+```
+
+Agent behavior notes:
+- Prefer `--migration-context` when context exists.
+- If `GAMES_DRIVE` is empty and a Windows games-drive hint exists, prompt for Linux partition mapping.
+- Never auto-commit backup payloads or raw/sensitive migration data.
+
 ---
 
 ## Purpose
@@ -37,12 +70,10 @@ Provisioning and maintenance agent for a portable Pop!_OS workstation setup.
 ## System Context
 
 ### Example Hardware (reference only)
-- **CPU**: AMD Ryzen 5 3600
-- **GPU**: AMD Radeon RX 580 (8GB) - Mesa/open-source drivers
-- **RAM**: 32GB DDR4
-- **Motherboard**: ASUS ROG STRIX X570-F GAMING
-- **Primary NVMe**: Samsung SSD 990 PRO 2TB
-- **Secondary NVMe**: WD Blue SN580 1TB
+- **CPU**: Modern x86_64 processor (AMD or Intel)
+- **GPU**: Mesa-supported integrated or discrete graphics
+- **RAM**: 16GB+ recommended
+- **Storage**: One or more SSD/NVMe drives
 
 ### OS Target
 - **Primary**: Pop!_OS (COSMIC edition)
@@ -140,17 +171,17 @@ This script:
 ### Example Output
 ```
 [1] /dev/nvme0n1
-    Model: Samsung SSD 990 PRO
-    Size: 1.8TB (nvme, medium)
+    Model: <drive-model-A>
+    Size: <size> (nvme, medium)
     Speed Class: fast
 
 [2] /dev/nvme1n1
-    Model: WD Blue SN580
-    Size: 931GB (nvme, medium)
+    Model: <drive-model-B>
+    Size: <size> (nvme, medium)
 
 Recommended Layout:
-OS Drive: /dev/nvme0n1 (990 PRO - faster)
-Game Drive: /dev/nvme1n1 (SN580)
+OS Drive: /dev/<device>
+Game Drive: /dev/<device>
 Storage: Use HDD if available
 ```
 
@@ -241,7 +272,7 @@ sudo apt install lutris
 ### GPU Check
 ```bash
 glxinfo | grep "OpenGL renderer"
-# Should show: AMD Radeon RX 580
+# Should show your active renderer
 ```
 
 ### Steam Issues
