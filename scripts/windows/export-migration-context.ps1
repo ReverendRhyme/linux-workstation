@@ -242,6 +242,7 @@ elseif (-not $hasGamingApps -and -not $hasDevApps -and -not $hasCadApps -and -no
 }
 
 $useFusion = if (($softwareMapItems | Where-Object { $_.name -match 'Fusion 360|Autodesk Fusion' } | Measure-Object).Count -gt 0) { "yes" } else { "no" }
+$fusionProvider = if ($useFusion -eq "yes") { "codeberg-script" } else { "web" }
 $enableCloud = if (($softwareMapItems | Where-Object { $_.name -match 'OneDrive|Google Drive|rclone|Dropbox' } | Measure-Object).Count -gt 0) { "yes" } else { "no" }
 
 $steamDriveHints = @($steamLibraries | ForEach-Object { Get-DriveLetterFromPath $_ } | Where-Object { $_ -and $_ -ne $driveIntent.system_drive } | Sort-Object -Unique)
@@ -258,6 +259,11 @@ $seedEnv = @(
     "MOUNT_STORAGE=/mnt/storage",
     "MOUNT_BACKUPS=/mnt/backups",
     "USE_FUSION360=$useFusion",
+    "FUSION360_PROVIDER=$fusionProvider",
+    "FUSION360_FALLBACK_PROVIDER=bottles",
+    "FUSION360_CHANNEL=stable",
+    "FUSION360_ENABLE_PROTON=no",
+    "FUSION360_PROTON_VERSION=GE-Proton10-32",
     "ENABLE_CLOUD_SETUP=$enableCloud",
     "WINDOWS_SYSTEM_DRIVE=$($driveIntent.system_drive)",
     "WINDOWS_GAMES_DRIVE_HINT=$gamesDriveHint",
@@ -288,6 +294,7 @@ $summary = @(
     "- Suggested profile: $profile",
     "- Suggested install mode: $($driveIntent.install_mode)",
     "- Fusion 360 flag: $useFusion",
+    "- Fusion 360 provider: $fusionProvider",
     "- Cloud setup flag: $enableCloud",
     "- Total apps inventoried: $($softwareMapItems.Count)",
     "",

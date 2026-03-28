@@ -17,10 +17,10 @@ install_cad() {
     log_info "Installing Blender flatpak..."
     install_flatpak "org.blender.Blender"
     
-    # Install Fusion 360 via cryinkfly's script
+    # Install Fusion 360 via maintained Codeberg script
     if ! command_exists fusion360; then
         log_info "Installing Fusion 360..."
-        if curl -L https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/setup/autodesk_fusion_installer_x86-64.sh -o /tmp/fusion_installer.sh 2>/dev/null; then
+        if curl -L https://codeberg.org/cryinkfly/Autodesk-Fusion-360-on-Linux/raw/branch/main/files/setup/autodesk_fusion_installer_x86-64.sh -o /tmp/fusion_installer.sh 2>/dev/null; then
             chmod +x /tmp/fusion_installer.sh
             sudo /tmp/fusion_installer.sh --install --default
             rm -f /tmp/fusion_installer.sh

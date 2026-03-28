@@ -1,0 +1,12 @@
+- name: Ensure virtualization tooling is installed for Fusion 360 VM fallback
+  ansible.builtin.apt:
+    name:
+      - virtualbox
+      - qemu-kvm
+      - virt-manager
+    state: present
+
+- name: Report VM fallback instructions
+  ansible.builtin.debug:
+    msg: >-
+      VM fallback selected. Create a Windows VM and install Fusion 360 inside the guest OS.

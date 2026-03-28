@@ -1,0 +1,22 @@
+- name: Create Fusion 360 web desktop entry
+  ansible.builtin.copy:
+    dest: "{{ fusion360_user_home }}/.local/share/applications/fusion360-web.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Name=Fusion 360 Web
+      Comment=Fusion 360 web fallback (degraded compared to native)
+      Exec=xdg-open https://fusion.cloud.autodesk.com
+      Icon=applications-internet
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;CAD;
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+
+- name: Warn about Fusion 360 web fallback limitations
+  ansible.builtin.debug:
+    msg: >-
+      Fusion 360 web fallback configured. This is degraded versus native Wine/Proton workflows.

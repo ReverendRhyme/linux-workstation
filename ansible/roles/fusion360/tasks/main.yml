@@ -1,40 +1,44 @@
-- name: Install Fusion 360 dependencies
-  apt:
-    name:
-      - wine
-      - wine64
-      - wine32
-      - winetricks
-      - p7zip
-      - p7zip-full
-      - p7zip-rar
-      - curl
-      - wget
-      - cabextract
-      - fonts-wine
-    state: present
+- name: Resolve Fusion 360 provider
+  ansible.builtin.set_fact:
+    fusion360_effective_provider: "{{ fusion360_provider | default('codeberg-script') }}"
+    fusion360_effective_fallback_provider: "{{ fusion360_fallback_provider | default('bottles') }}"
 
-- name: Download Fusion 360 installer
-  get_url:
-    url: "https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/main/files/setup/autodesk_fusion_installer_x86-64.sh"
-    dest: "/tmp/fusion360_installer.sh"
-    mode: '0755'
+- name: Validate Fusion 360 provider choices
+  ansible.builtin.assert:
+    that:
+      - fusion360_effective_provider in ['codeberg-script', 'bottles', 'web', 'vm']
+      - fusion360_effective_fallback_provider in ['none', 'codeberg-script', 'bottles', 'web', 'vm']
+    fail_msg: >-
+      Invalid Fusion 360 provider value(s). provider={{ fusion360_effective_provider }},
+      fallback={{ fusion360_effective_fallback_provider }}
 
-- name: Install Fusion 360
-  command: "/tmp/fusion360_installer.sh --install --default"
-  args:
-    creates: "{{ ansible_user_dir }}/.wine-pfx/Fusion 360"
+- name: Install Fusion 360 using selected provider
+  block:
+    - name: Run primary Fusion 360 provider tasks
+      ansible.builtin.include_tasks: "providers/{{ fusion360_effective_provider }}.yml"
+  rescue:
+    - name: Report primary Fusion 360 provider failure
+      ansible.builtin.debug:
+        msg: >-
+          Primary Fusion 360 provider '{{ fusion360_effective_provider }}' failed.
+          Trying fallback '{{ fusion360_effective_fallback_provider }}'.
 
-- name: Create Fusion 360 desktop entry
-  copy:
-    dest: "{{ ansible_user_dir }}/.local/share/applications/fusion360.desktop"
-    content: |
-      [Desktop Entry]
-      Name=Autodesk Fusion 360
-      Comment=3D CAD, CAM, and CAE software
-      Exec=wine "{{ ansible_user_dir }}/.wine-pfx/Fusion 360/Fusion360.exe"
-      Icon={{ ansible_user_dir }}/.wine-pfx/Fusion 360/Fusion360.png
-      Terminal=false
-      Type=Application
-      Categories=Graphics;3DGraphics;CAD;
-    mode: '0644'
+    - name: Fail when Fusion 360 fallback is disabled
+      ansible.builtin.fail:
+        msg: >-
+          Fusion 360 installation failed and no fallback provider is enabled.
+          Set fusion360_fallback_provider to one of: bottles, web, vm.
+      when:
+        - fusion360_effective_fallback_provider == 'none'
+
+    - name: Skip invalid or duplicate Fusion 360 fallback provider
+      ansible.builtin.fail:
+        msg: >-
+          Fusion 360 fallback provider '{{ fusion360_effective_fallback_provider }}' is invalid
+          or matches the primary provider '{{ fusion360_effective_provider }}'.
+      when:
+        - fusion360_effective_fallback_provider not in ['codeberg-script', 'bottles', 'web', 'vm']
+          or fusion360_effective_fallback_provider == fusion360_effective_provider
+
+    - name: Run fallback Fusion 360 provider tasks
+      ansible.builtin.include_tasks: "providers/{{ fusion360_effective_fallback_provider }}.yml"

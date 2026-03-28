@@ -1,0 +1,71 @@
+- name: Resolve Fusion 360 installer URL
+  ansible.builtin.set_fact:
+    fusion360_installer_url: >-
+      {{
+        fusion360_pinned_url
+        if (fusion360_pinned_url | length) > 0
+        else (fusion360_codeberg_installer_url_dev if fusion360_channel == 'dev' else fusion360_codeberg_installer_url)
+      }}
+    fusion360_proton_arg: "{{ ' --proton=' ~ fusion360_proton_version if (fusion360_enable_proton | bool) else '' }}"
+
+- name: Validate Fusion 360 channel
+  ansible.builtin.assert:
+    that:
+      - fusion360_channel in ['stable', 'dev']
+    fail_msg: "Invalid Fusion 360 channel '{{ fusion360_channel }}'. Use stable or dev."
+
+- name: Install Fusion 360 dependencies
+  ansible.builtin.apt:
+    name:
+      - wine
+      - wine64
+      - wine32
+      - winetricks
+      - p7zip
+      - p7zip-full
+      - p7zip-rar
+      - curl
+      - wget
+      - cabextract
+      - fonts-wine
+      - winbind
+    state: present
+
+- name: Download Fusion 360 installer from Codeberg
+  ansible.builtin.get_url:
+    url: "{{ fusion360_installer_url }}"
+    dest: "{{ fusion360_installer_tmp_path }}"
+    mode: "0755"
+    checksum: "{{ ('sha256:' ~ fusion360_installer_sha256) if (fusion360_installer_sha256 | length) > 0 else omit }}"
+
+- name: Check existing Fusion 360 binary
+  ansible.builtin.stat:
+    path: "{{ fusion360_binary_path }}"
+  register: fusion360_binary_stat
+
+- name: Install Fusion 360 with Codeberg script
+  ansible.builtin.command:
+    cmd: "{{ fusion360_installer_tmp_path }} --install --default{{ fusion360_proton_arg }}"
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  when: not fusion360_binary_stat.stat.exists
+
+- name: Create Fusion 360 desktop entry (native)
+  ansible.builtin.copy:
+    dest: "{{ fusion360_user_home }}/.local/share/applications/fusion360.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Name=Autodesk Fusion 360
+      Comment=3D CAD, CAM, and CAE software
+      Exec={{ fusion360_binary_path }}
+      Icon=applications-engineering
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;CAD;
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"

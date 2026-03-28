@@ -5,5 +5,6 @@
 - Sanitized: true
 - Suggested profile: full
 - Suggested install mode: dualboot
+- Fusion provider: codeberg-script (fallback: bottles)
 
 This sample context is used for CI validation and documentation examples.

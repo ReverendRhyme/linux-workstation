@@ -73,6 +73,10 @@ Use `QUICKSTART.md` for the canonical command sequence.
 Detailed migration policy (allowlist, safety rules, and AI-agent contract):
 - `migration/README.md`
 
+Fusion 360 native runtime defaults:
+- `FUSION360_PROVIDER=codeberg-script`
+- `FUSION360_FALLBACK_PROVIDER=bottles`
+
 ## Migration Checklist
 
 Portable migration guidance is in `SETUP_GUIDE.md`.
@@ -208,7 +212,7 @@ Package source of truth: `ansible/roles/dev/tasks/main.yml`.
 | FreeCAD | Parametric CAD (Fusion 360 alternative) |
 | OpenSCAD | Script-based 3D modeling |
 | MeshLab | Mesh processing |
-| Fusion 360 | Full CAD via Wine (cryinkfly script) |
+| Fusion 360 | Full CAD via Wine/Proton (Codeberg provider) |
 
 Package source of truth: `ansible/roles/cad/tasks/main.yml` and `ansible/roles/fusion360/tasks/main.yml`.
 
