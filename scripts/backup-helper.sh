@@ -51,11 +51,11 @@ check_path "C:/ProgramData/Epic" "Epic Data"
 echo ""
 echo "=== Recommended Copy Commands ==="
 echo ""
-echo "# Run these to backup to external drive (E: in this example):"
+echo "# Run these to backup to external drive (replace <drive-letter>):"
 echo ""
-echo 'xcopy /E /I /Y "%USERPROFILE%\Desktop" "E:\backups\Desktop\\"'
-echo 'xcopy /E /I /Y "%USERPROFILE%\Documents" "E:\backups\Documents\\"'
-echo 'xcopy /E /I /Y "%LOCALAPPDATA%\Google\Chrome\User Data\Default" "E:\backups\Chrome\\"'
+echo 'xcopy /E /I /Y "%USERPROFILE%\Desktop" "<drive-letter>:\backups\Desktop\\"'
+echo 'xcopy /E /I /Y "%USERPROFILE%\Documents" "<drive-letter>:\backups\Documents\\"'
+echo 'xcopy /E /I /Y "%LOCALAPPDATA%\Google\Chrome\User Data\Default" "<drive-letter>:\backups\Chrome\\"'
 echo ""
 
 echo "=== Quick Steam Library Backup ==="
@@ -85,6 +85,6 @@ echo "[ ] External drive verified"
 echo ""
 
 echo "After Pop_OS! install, see:"
-echo "  - PREFLIGHT_CHECKLIST.md"
+echo "  - docs/personal/PREFLIGHT_CHECKLIST.md"
 echo "  - SETUP_GUIDE.md"
 echo ""

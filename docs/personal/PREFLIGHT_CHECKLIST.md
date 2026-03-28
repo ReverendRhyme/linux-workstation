@@ -16,7 +16,7 @@ Complete this checklist **before** installing Pop_OS! to ensure a smooth migrati
 
 ### Backup Location
 Copy to external drive or cloud:
-- Samsung T7 external SSD
+- External SSD/HDD
 - Backblaze (if installed)
 - OneDrive (already synced)
 
@@ -60,7 +60,7 @@ Manual Games:    Check individual game settings
 | Autodesk AutoCAD | [ ] | Windows only - use VM |
 | Microsoft Office | [ ] | Use LibreOffice or web |
 | Adobe CC | [ ] | Some apps work via PlayOnLinux |
-| ASUS Armoury Crate | [ ] | Not needed (AMD GPU) |
+| Vendor hardware suites | [ ] | Usually not needed on Linux |
 | Nahimic | [ ] | Not needed |
 
 ---
@@ -79,12 +79,14 @@ Manual Games:    Check individual game settings
 [ ] Game 3: _____________  | ProtonDB Rating: _______
 ```
 
-### Games Likely to Work (AMD GPU + Proton)
+### Games Likely to Work (Proton)
 - Most single-player games
 - Indie games
 - Games without anti-cheat
+- Most DirectX 11/12 titles rated Gold/Platinum on ProtonDB
+
+Example titles (reference only):
 - Elder Scrolls V: Skyrim
-- Most FromSoftware games
 - Baldur's Gate 3
 - Cyberpunk 2077
 
@@ -126,7 +128,7 @@ Before installation day:
 
 ### Check These Work in Live Environment
 - [ ] WiFi connects
-- [ ] Display correct resolution (2560x1440)
+- [ ] Display uses native monitor resolution
 - [ ] Keyboard/mouse work
 - [ ] Sound plays
 - [ ] Files can be accessed
@@ -198,7 +200,7 @@ Reasons:
 4. **Defragment drives** - Not needed for SSD
 
 ### License Keys (Usually Digital)
-- Windows 11 is tied to Microsoft account
+- Windows license is tied to Microsoft account
 - Office 365 is subscription-based
 - Most games are digital (Steam/Epic)
 

@@ -37,12 +37,10 @@ Provisioning and maintenance agent for a portable Pop!_OS workstation setup.
 ## System Context
 
 ### Example Hardware (reference only)
-- **CPU**: AMD Ryzen 5 3600
-- **GPU**: AMD Radeon RX 580 (8GB) - Mesa/open-source drivers
-- **RAM**: 32GB DDR4
-- **Motherboard**: ASUS ROG STRIX X570-F GAMING
-- **Primary NVMe**: Samsung SSD 990 PRO 2TB
-- **Secondary NVMe**: WD Blue SN580 1TB
+- **CPU**: Modern x86_64 processor (AMD or Intel)
+- **GPU**: Mesa-supported integrated or discrete graphics
+- **RAM**: 16GB+ recommended
+- **Storage**: One or more SSD/NVMe drives
 
 ### OS Target
 - **Primary**: Pop!_OS (COSMIC edition)
@@ -140,17 +138,17 @@ This script:
 ### Example Output
 ```
 [1] /dev/nvme0n1
-    Model: Samsung SSD 990 PRO
-    Size: 1.8TB (nvme, medium)
+    Model: <drive-model-A>
+    Size: <size> (nvme, medium)
     Speed Class: fast
 
 [2] /dev/nvme1n1
-    Model: WD Blue SN580
-    Size: 931GB (nvme, medium)
+    Model: <drive-model-B>
+    Size: <size> (nvme, medium)
 
 Recommended Layout:
-OS Drive: /dev/nvme0n1 (990 PRO - faster)
-Game Drive: /dev/nvme1n1 (SN580)
+OS Drive: /dev/<device>
+Game Drive: /dev/<device>
 Storage: Use HDD if available
 ```
 
@@ -241,7 +239,7 @@ sudo apt install lutris
 ### GPU Check
 ```bash
 glxinfo | grep "OpenGL renderer"
-# Should show: AMD Radeon RX 580
+# Should show your active renderer
 ```
 
 ### Steam Issues

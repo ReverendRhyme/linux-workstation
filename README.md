@@ -27,8 +27,8 @@ This repository is designed to be portable across most Pop!_OS-compatible hardwa
 
 ```bash
 # 1. Clone this repo (or your fork)
-git clone https://github.com/ReverendRhyme/linux-workstation.git
-cd linux-workstation
+git clone <your-fork-url>
+cd <repo-directory>
 
 # 2. Generate hardware report (for AI decisions)
 ./scripts/hardware-report.sh
@@ -80,8 +80,14 @@ Preset options for non-interactive mode:
 
 ## Migration Checklist
 
-Dedicated E-drive dual-boot runbook:
-- `docs/POP_OS_DUAL_BOOT_PLAN.md`
+Portable migration guidance is in `SETUP_GUIDE.md`.
+
+Machine-specific runbooks and notes live under `docs/personal/`:
+- `docs/personal/POP_OS_DUAL_BOOT_PLAN.md`
+- `docs/personal/PREFLIGHT_CHECKLIST.md`
+- `docs/personal/DAY1_CUTOVER_CHECKLIST.md`
+- `docs/personal/HANDOVER.md`
+- `docs/personal/hardware-notes.md`
 
 ### Before Installation (Windows Side)
 - [ ] Backup important data to external drive
@@ -158,8 +164,9 @@ linux-workstation/
 │   └── modules/           # Legacy per-category installer scripts
 ├── configs/
 │   ├── fstab.example      # Template for /etc/fstab
-│   ├── zshrc.example      # ZSH configuration
-│   └── hardware-notes.md  # Full hardware documentation
+│   └── zshrc.example      # ZSH configuration
+├── docs/
+│   └── personal/          # Optional machine-specific runbooks
 └── .github/
     └── workflows/         # CI/CD (ansible-lint)
 ```
@@ -281,7 +288,7 @@ Then mount and use in Steam:
 ### GPU not detected
 ```bash
 glxinfo | grep "OpenGL renderer"
-# Should show: AMD Radeon RX 580
+# Should show your active renderer (Mesa/AMD/Intel/NVIDIA)
 ```
 
 ### Steam games not launching
@@ -312,7 +319,7 @@ ncdu -x /
 btop
 
 # Check GPU
-vulkan-smi
+vulkaninfo --summary
 ```
 
 ---

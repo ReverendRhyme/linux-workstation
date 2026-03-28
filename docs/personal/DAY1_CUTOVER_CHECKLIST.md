@@ -1,11 +1,15 @@
-# Day 1 Cutover Checklist (Windows 11 -> Pop!_OS COSMIC)
+# Day 1 Cutover Checklist Template (Windows -> Pop!_OS)
 
-Use this runbook on migration day for a safe cutover.
+Use this runbook on migration day. Replace placeholders before execution.
+
+Example values from a prior migration (optional reference):
+- Backup target path: `S:\My Drive`
+- Clone URL: `git clone https://github.com/<owner>/<repo>.git`
 
 ## 1) Backup Gate (Do not skip)
 
-1. Confirm Google Drive Desktop is signed in and synced.
-2. Confirm target path exists: `S:\My Drive`.
+1. Confirm your backup provider is signed in and synced.
+2. Confirm target path exists: `<backup-target-path>` (example: `S:\My Drive`).
 3. Close browsers before backup (Chrome/Edge/Firefox/Brave).
 4. Run backup helper from Windows PowerShell:
    - `powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads`
@@ -27,9 +31,9 @@ Use this runbook on migration day for a safe cutover.
 ## 3) Clone and Preflight
 
 1. Clone repo:
-   - `git clone https://github.com/ReverendRhyme/linux-workstation.git`
+   - `git clone <your-fork-url>`
 2. Run dry-run preview:
-   - `cd linux-workstation`
+   - `cd <repo-directory>`
    - `./scripts/popos-auto.sh --dry-run`
 
 ## 4) Guided Provisioning
@@ -52,7 +56,7 @@ Use this runbook on migration day for a safe cutover.
 
 ## 6) Restore and Sign-In
 
-1. Restore files from Google Drive backup bundle.
+1. Restore files from your backup bundle.
 2. Sign in to Steam, Epic/GOG (Heroic), Discord, 1Password, Slack, Zoom.
 3. Re-import browser profiles/bookmarks and app settings.
 

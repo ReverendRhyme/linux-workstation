@@ -20,7 +20,7 @@ fi
 
 MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 REPO_NAME="${REPO_NAME:-linux-workstation}"
-REPO_URL="${REPO_URL:-https://github.com/ReverendRhyme/linux-workstation}"
+REPO_URL="${REPO_URL:-https://github.com/<your-user>/<your-repo>.git}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -235,7 +235,7 @@ cat << 'EOF'
   Documentation:
     - README.md          - Overview
     - SETUP_GUIDE.md     - Detailed walkthrough
-    - configs/hardware-notes.md  - Hardware spec
+    - docs/personal/hardware-notes.md  - Optional hardware-specific notes
 
   Useful Commands:
     - btop               - System monitor
