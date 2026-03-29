@@ -46,6 +46,13 @@ cd <repo-directory>
 ./scripts/popos-auto.sh --migration-context migration/context/<machine-id>
 ```
 
+Bare-metal snapshot loop (Btrfs + snapper):
+
+```bash
+./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
+```
+
 Preset options:
 - `single-disk` - single-drive systems, full profile
 - `dual-disk` - gaming-focused dual-drive systems
@@ -158,8 +165,10 @@ linux-workstation/
 │   ├── drive-recommend.sh # Drive detection + recommendations
 │   ├── mount-drives.sh    # Mount helper
 │   ├── maintenance.sh     # System updates
-│   ├── linux/             # Linux migration import + policy checks
+│   ├── linux/             # Linux migration import + policy + bare-metal loop tools
 │   └── windows/           # Windows backup + migration export helpers
+├── automation/
+│   └── test-loop/         # Durable test-loop state and iteration logs
 ├── migration/
 │   ├── README.md          # Migration branch workflow + safety
 │   ├── schema/            # JSON schemas for migration context

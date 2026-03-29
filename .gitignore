@@ -21,6 +21,9 @@ migration/context/**/*.sqlite
 migration/context/**/*.db
 migration/context/**/*.key
 migration/context/**/*.pem
+automation/test-loop/state.env
+automation/test-loop/LATEST.md
+automation/test-loop/runs/
 
 !.env.example
 !*.local.example

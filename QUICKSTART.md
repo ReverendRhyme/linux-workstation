@@ -82,3 +82,20 @@ For unattended automation:
 ```bash
 ./scripts/popos-auto.sh --migration-context migration/context/<machine-id> --non-interactive --preset dual-disk
 ```
+
+## Bare-metal snapshot loop (optional)
+
+For repeatable physical-hardware testing with rollback:
+
+```bash
+# 1) Create baseline once
+./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean
+
+# 2) Optional: install boot-resume service
+./scripts/linux/install-baremetal-loop-resume-service.sh
+
+# 3) Run one iteration and rollback
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
+```
+
+Use a `STATE_DIR` path that survives rollback.

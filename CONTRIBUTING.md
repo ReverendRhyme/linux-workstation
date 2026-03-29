@@ -21,7 +21,7 @@ pre-commit install
 
 ```bash
 bash -n scripts/full-setup.sh scripts/popos-auto.sh scripts/agent-configure.sh scripts/hardware-report.sh
-bash -n scripts/linux/import-migration-context.sh scripts/linux/check-migration-allowlist.sh
+bash -n scripts/linux/import-migration-context.sh scripts/linux/check-migration-allowlist.sh scripts/linux/btrfs-snapshot-loop.sh scripts/linux/run-baremetal-test-loop.sh scripts/linux/install-baremetal-loop-resume-service.sh
 python3 scripts/linux/validate-migration-context.py --help
 python3 scripts/linux/validate-migration-context.py --all-contexts --context-root migration/context
 ansible-playbook --syntax-check -i ansible/inventory.yml ansible/site.yml

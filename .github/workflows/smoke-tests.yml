@@ -18,6 +18,9 @@ jobs:
           bash -n scripts/agent-configure.sh
           bash -n scripts/linux/import-migration-context.sh
           bash -n scripts/linux/check-migration-allowlist.sh
+          bash -n scripts/linux/btrfs-snapshot-loop.sh
+          bash -n scripts/linux/run-baremetal-test-loop.sh
+          bash -n scripts/linux/install-baremetal-loop-resume-service.sh
 
       - name: Validate migration context schema helper
         run: |
