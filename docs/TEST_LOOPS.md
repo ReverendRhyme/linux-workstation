@@ -1,0 +1,79 @@
+# Agentic Test Loops
+
+Unified operator runbook for iterative migration/setup testing with AI agents.
+
+## Trigger Phrases (from `AGENTS.md`)
+
+- Windows migration loop: `run windows migration test loop`
+- Bare-metal snapshot loop: `run baremetal migration test loop`
+
+## Loop A: Windows Migration QA (Closed-Loop)
+
+Goal: validate export + context generation, capture failures, and feed repair PRs.
+
+Run from repo root on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+```
+
+Optional flags:
+
+- `-SkipBackup` (export + validation only)
+- `-PrepareFixBranch` (create `fix/migration-loop/<yyyymmdd>-<topic>` on failure)
+
+Expected outcomes:
+
+- `Status: PASS` when backup/export/validation complete
+- `Status: BLOCKED` when a step fails, with incident details appended to `migration/context/<machine-id>/summary.md`
+
+References:
+
+- `scripts/windows/README.md`
+- `migration/README.md`
+
+## Loop B: Bare-Metal Snapshot QA (Pop!_OS Hardware)
+
+Goal: run setup tests from a known-clean baseline and repeat quickly.
+
+Prerequisites:
+
+- Btrfs root + `snapper` available
+- durable `STATE_DIR` path that survives rollback (example: `/mnt/storage/linux-workstation-test-loop`)
+
+1) Create baseline snapshot once:
+
+```bash
+./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean
+```
+
+2) Optional boot-resume service:
+
+```bash
+./scripts/linux/install-baremetal-loop-resume-service.sh
+```
+
+3) Run one iteration + rollback + reboot:
+
+```bash
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
+```
+
+Loop artifacts:
+
+- `automation/test-loop/state.env`
+- `automation/test-loop/LATEST.md`
+- `automation/test-loop/runs/<run-id>/iteration-<n>.md`
+
+References:
+
+- `automation/test-loop/README.md`
+- `scripts/linux/run-baremetal-test-loop.sh --help`
+- `scripts/linux/btrfs-snapshot-loop.sh --help`
+
+## Safety Rules
+
+- Commit only sanitized migration context files under `migration/context/<machine-id>/`.
+- Never commit backup payload directories or raw/sensitive exports.
+- Treat rollback as destructive to uncommitted local changes.
+- Use minimal fixes and PR each repair before rerunning loops.

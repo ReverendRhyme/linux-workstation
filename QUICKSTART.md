@@ -102,3 +102,5 @@ STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal
 ```
 
 Use a `STATE_DIR` path that survives rollback.
+
+For a unified operator runbook of both loops, see `docs/TEST_LOOPS.md`.

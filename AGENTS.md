@@ -10,6 +10,7 @@
 ## Quick Start for AI Agents
 
 For a concise command-only runbook, see `QUICKSTART.md`.
+For loop-focused operations, see `docs/TEST_LOOPS.md`.
 
 When a user says "set up my Linux workstation" or "run the setup":
 
