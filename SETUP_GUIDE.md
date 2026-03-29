@@ -239,7 +239,7 @@ For unattended automation with known disk layout:
 This will:
 - Install Ansible
 - Install all base packages (htop, btop, flatpak, etc.)
-- Install gaming stack (Steam, Heroic, mangohud, gamemode)
+- Install gaming stack (Steam, Lutris, Heroic, ProtonUp-Qt, mangohud, gamemode)
 - Install dev tools (Docker, ZSH, Oh My Zsh)
 - Configure UFW firewall
 
@@ -310,10 +310,23 @@ mangohud gamemoderun %command%
 4. Login to Epic/GOG accounts
 5. Set Install Location to `/mnt/games/Heroic`
 
+### Lutris (Battle.net/other non-Steam launchers)
+1. Launch Lutris from app menu
+2. Add runner or import game installer script
+3. Set default game path to `/mnt/games/Lutris`
+
 ### Proton GE (Better Compatibility)
 1. Open ProtonUp-Qt
 2. Download latest Proton GE
 3. Select Proton GE in Steam/Heroic
+
+### Optional Flatpak Gaming Tools
+- `GAMING_EXTENDED_TOOLS=yes` enables:
+  - Flatseal (Flatpak permissions)
+  - Warehouse (Flatpak cleanup/manage)
+  - Gear Lever (AppImage integration)
+
+Policy note: gaming apps are Flatpak-first when available; Steam stays on apt by design.
 
 ---
 

@@ -59,7 +59,7 @@ The export includes:
 - machine profile + storage summary
 - software map with Linux install intent categories
 - drive/install intent hints (fresh vs dualboot)
-- deployment seed env for Linux import (including Fusion 360 provider defaults)
+- deployment seed env for Linux import (including Fusion 360 provider defaults and gaming extended-tools flag)
 
 ## Optional arguments
 

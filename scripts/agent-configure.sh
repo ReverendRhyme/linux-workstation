@@ -22,6 +22,7 @@ MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
 MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
 DEPLOY_PROFILE="${DEPLOY_PROFILE:-full}"
 INSTALL_MODE="${INSTALL_MODE:-fresh}"
+GAMING_EXTENDED_TOOLS="${GAMING_EXTENDED_TOOLS:-no}"
 USE_FUSION360="${USE_FUSION360:-no}"
 FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
 FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
@@ -190,6 +191,7 @@ run_guided() {
     prompt_default "MOUNT_GAMES" "Games mount point" "$MOUNT_GAMES"
     prompt_default "MOUNT_STORAGE" "Storage mount point" "$MOUNT_STORAGE"
     prompt_default "MOUNT_BACKUPS" "Backup mount point" "$MOUNT_BACKUPS"
+    prompt_default "GAMING_EXTENDED_TOOLS" "Install extended gaming flatpak tools (Flatseal/Warehouse/Gear Lever)? (yes|no)" "$GAMING_EXTENDED_TOOLS"
     prompt_default "USE_FUSION360" "Install Fusion 360 via Wine? (yes|no)" "$USE_FUSION360"
     prompt_default "FUSION360_PROVIDER" "Fusion 360 provider (codeberg-script|bottles|web|vm)" "$FUSION360_PROVIDER"
     prompt_default "FUSION360_FALLBACK_PROVIDER" "Fusion 360 fallback provider (bottles|web|vm|none)" "$FUSION360_FALLBACK_PROVIDER"
@@ -228,7 +230,7 @@ run_guided() {
 run_non_interactive() {
     local existing_profile existing_install existing_os existing_games existing_storage existing_backup
     local existing_mount_games existing_mount_storage existing_mount_backups
-    local existing_fusion existing_fusion_provider existing_fusion_fallback existing_fusion_channel
+    local existing_gaming_extended existing_fusion existing_fusion_provider existing_fusion_fallback existing_fusion_channel
     local existing_fusion_proton existing_fusion_proton_version existing_cloud
 
     existing_profile="$(read_saved_value "DEPLOY_PROFILE")"
@@ -240,6 +242,7 @@ run_non_interactive() {
     existing_mount_games="$(read_saved_value "MOUNT_GAMES")"
     existing_mount_storage="$(read_saved_value "MOUNT_STORAGE")"
     existing_mount_backups="$(read_saved_value "MOUNT_BACKUPS")"
+    existing_gaming_extended="$(read_saved_value "GAMING_EXTENDED_TOOLS")"
     existing_fusion="$(read_saved_value "USE_FUSION360")"
     existing_fusion_provider="$(read_saved_value "FUSION360_PROVIDER")"
     existing_fusion_fallback="$(read_saved_value "FUSION360_FALLBACK_PROVIDER")"
@@ -259,6 +262,7 @@ run_non_interactive() {
     MOUNT_GAMES="${MOUNT_GAMES:-$existing_mount_games}"
     MOUNT_STORAGE="${MOUNT_STORAGE:-$existing_mount_storage}"
     MOUNT_BACKUPS="${MOUNT_BACKUPS:-$existing_mount_backups}"
+    GAMING_EXTENDED_TOOLS="${GAMING_EXTENDED_TOOLS:-$existing_gaming_extended}"
     USE_FUSION360="${USE_FUSION360:-$existing_fusion}"
     FUSION360_PROVIDER="${FUSION360_PROVIDER:-$existing_fusion_provider}"
     FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-$existing_fusion_fallback}"
@@ -272,6 +276,7 @@ run_non_interactive() {
     MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
     MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
     MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
+    GAMING_EXTENDED_TOOLS="${GAMING_EXTENDED_TOOLS:-no}"
     USE_FUSION360="${USE_FUSION360:-no}"
     FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
     FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
@@ -292,6 +297,7 @@ run_non_interactive() {
     write_config_value "MOUNT_GAMES" "$MOUNT_GAMES"
     write_config_value "MOUNT_STORAGE" "$MOUNT_STORAGE"
     write_config_value "MOUNT_BACKUPS" "$MOUNT_BACKUPS"
+    write_config_value "GAMING_EXTENDED_TOOLS" "$GAMING_EXTENDED_TOOLS"
     write_config_value "USE_FUSION360" "$USE_FUSION360"
     write_config_value "FUSION360_PROVIDER" "$FUSION360_PROVIDER"
     write_config_value "FUSION360_FALLBACK_PROVIDER" "$FUSION360_FALLBACK_PROVIDER"

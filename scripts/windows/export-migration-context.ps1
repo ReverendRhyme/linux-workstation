@@ -242,6 +242,7 @@ elseif (-not $hasGamingApps -and -not $hasDevApps -and -not $hasCadApps -and -no
 }
 
 $useFusion = if (($softwareMapItems | Where-Object { $_.name -match 'Fusion 360|Autodesk Fusion' } | Measure-Object).Count -gt 0) { "yes" } else { "no" }
+$gamingExtended = "no"
 $fusionProvider = if ($useFusion -eq "yes") { "codeberg-script" } else { "web" }
 $enableCloud = if (($softwareMapItems | Where-Object { $_.name -match 'OneDrive|Google Drive|rclone|Dropbox' } | Measure-Object).Count -gt 0) { "yes" } else { "no" }
 
@@ -258,6 +259,7 @@ $seedEnv = @(
     "MOUNT_GAMES=/mnt/games",
     "MOUNT_STORAGE=/mnt/storage",
     "MOUNT_BACKUPS=/mnt/backups",
+    "GAMING_EXTENDED_TOOLS=$gamingExtended",
     "USE_FUSION360=$useFusion",
     "FUSION360_PROVIDER=$fusionProvider",
     "FUSION360_FALLBACK_PROVIDER=bottles",
@@ -293,6 +295,7 @@ $summary = @(
     "- Sanitized: $([bool]$Sanitize.IsPresent)",
     "- Suggested profile: $profile",
     "- Suggested install mode: $($driveIntent.install_mode)",
+    "- Extended gaming tools flag: $gamingExtended",
     "- Fusion 360 flag: $useFusion",
     "- Fusion 360 provider: $fusionProvider",
     "- Cloud setup flag: $enableCloud",

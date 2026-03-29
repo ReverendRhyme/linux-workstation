@@ -60,6 +60,9 @@ If Fusion 360 is required, confirm `config/deployment.local.env` contains:
 - `FUSION360_PROVIDER=codeberg-script`
 - `FUSION360_FALLBACK_PROVIDER=bottles`
 
+If you want optional gaming tool extras (Flatseal/Warehouse/Gear Lever):
+- `GAMING_EXTENDED_TOOLS=yes`
+
 If `GAMES_DRIVE` is blank and a Windows games-drive hint exists, the importer prompts for Linux partition mapping.
 
 ## 4) Validate migration artifacts (optional)

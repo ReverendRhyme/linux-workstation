@@ -1,5 +1,5 @@
 - name: Install gaming packages
-  apt:
+  ansible.builtin.apt:
     name:
       - steam
       - gamemode
@@ -11,56 +11,128 @@
     state: present
 
 - name: Install media codecs
-  apt:
+  ansible.builtin.apt:
     name: ubuntu-restricted-extras
     state: present
 
+- name: Ensure Flathub remote exists for gaming flatpaks
+  ansible.builtin.command:
+    cmd: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  changed_when: false
+
+- name: Check Lutris flatpak
+  ansible.builtin.command:
+    cmd: flatpak info net.lutris.Lutris
+  register: flatpak_lutris
+  changed_when: false
+  failed_when: false
+
+- name: Install Lutris (flatpak-first)
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub net.lutris.Lutris
+  when: flatpak_lutris.rc != 0
+
 - name: Check Heroic Games Launcher flatpak
-  command: flatpak info com.heroicgameslauncher.hgl
+  ansible.builtin.command:
+    cmd: flatpak info com.heroicgameslauncher.hgl
   register: flatpak_heroic
   changed_when: false
   failed_when: false
 
 - name: Install Heroic Games Launcher
-  command: flatpak install -y flathub com.heroicgameslauncher.hgl
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub com.heroicgameslauncher.hgl
   when: flatpak_heroic.rc != 0
 
 - name: Check ProtonUp-Qt flatpak
-  command: flatpak info net.davidotek.pupgui2
+  ansible.builtin.command:
+    cmd: flatpak info net.davidotek.pupgui2
   register: flatpak_protonup
   changed_when: false
   failed_when: false
 
 - name: Install ProtonUp-Qt
-  command: flatpak install -y flathub net.davidotek.pupgui2
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub net.davidotek.pupgui2
   when: flatpak_protonup.rc != 0
 
 - name: Check Discord flatpak
-  command: flatpak info com.discordapp.Discord
+  ansible.builtin.command:
+    cmd: flatpak info com.discordapp.Discord
   register: flatpak_discord
   changed_when: false
   failed_when: false
 
 - name: Install Discord (for gaming voice chat)
-  command: flatpak install -y flathub com.discordapp.Discord
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub com.discordapp.Discord
   when: flatpak_discord.rc != 0
 
 - name: Check VLC flatpak
-  command: flatpak info org.videolan.VLC
+  ansible.builtin.command:
+    cmd: flatpak info org.videolan.VLC
   register: flatpak_vlc
   changed_when: false
   failed_when: false
 
 - name: Install VLC
-  command: flatpak install -y flathub org.videolan.VLC
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub org.videolan.VLC
   when: flatpak_vlc.rc != 0
 
 - name: Check OBS Studio flatpak
-  command: flatpak info com.obsproject.Studio
+  ansible.builtin.command:
+    cmd: flatpak info com.obsproject.Studio
   register: flatpak_obs
   changed_when: false
   failed_when: false
 
 - name: Install OBS Studio
-  command: flatpak install -y flathub com.obsproject.Studio
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub com.obsproject.Studio
   when: flatpak_obs.rc != 0
+
+- name: Check Flatseal flatpak (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak info com.github.tchx84.Flatseal
+  register: flatpak_flatseal
+  changed_when: false
+  failed_when: false
+  when: gaming_extended_tools | bool
+
+- name: Install Flatseal (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub com.github.tchx84.Flatseal
+  when:
+    - gaming_extended_tools | bool
+    - flatpak_flatseal.rc != 0
+
+- name: Check Warehouse flatpak (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak info io.github.flattool.Warehouse
+  register: flatpak_warehouse
+  changed_when: false
+  failed_when: false
+  when: gaming_extended_tools | bool
+
+- name: Install Warehouse (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub io.github.flattool.Warehouse
+  when:
+    - gaming_extended_tools | bool
+    - flatpak_warehouse.rc != 0
+
+- name: Check Gear Lever flatpak (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak info it.mijorus.gearlever
+  register: flatpak_gearlever
+  changed_when: false
+  failed_when: false
+  when: gaming_extended_tools | bool
+
+- name: Install Gear Lever (extended gaming tools)
+  ansible.builtin.command:
+    cmd: flatpak install -y flathub it.mijorus.gearlever
+  when:
+    - gaming_extended_tools | bool
+    - flatpak_gearlever.rc != 0
