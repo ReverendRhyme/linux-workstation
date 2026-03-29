@@ -40,7 +40,10 @@ function Get-InstalledApps {
 
     $apps = foreach ($regPath in $uninstallPaths) {
         Get-ItemProperty $regPath -ErrorAction SilentlyContinue |
-            Where-Object { $_.DisplayName } |
+            Where-Object {
+                $_.PSObject.Properties['DisplayName'] -and
+                -not [string]::IsNullOrWhiteSpace([string]$_.DisplayName)
+            } |
             Select-Object @{ Name = "Name"; Expression = { $_.DisplayName } },
                           @{ Name = "Version"; Expression = { $_.DisplayVersion } },
                           @{ Name = "Publisher"; Expression = { $_.Publisher } }
@@ -269,7 +272,7 @@ $seedEnv = @(
     "ENABLE_CLOUD_SETUP=$enableCloud",
     "WINDOWS_SYSTEM_DRIVE=$($driveIntent.system_drive)",
     "WINDOWS_GAMES_DRIVE_HINT=$gamesDriveHint",
-    "WINDOWS_STEAM_LIBRARY_COUNT=$($steamLibraries.Count)"
+    "WINDOWS_STEAM_LIBRARY_COUNT=$(@($steamLibraries).Count)"
 )
 
 $machineProfilePath = Join-Path $OutputDir "machine-profile.json"
@@ -310,13 +313,13 @@ $summary = @(
     "",
     "## Suggested Git Commands",
     "",
-    "```powershell",
+    '```powershell',
     "git checkout -b migration/windows/$machineId/$((Get-Date).ToString('yyyyMMdd'))",
     "git add migration/context/$machineId",
     "git status",
     "git commit -m 'Add sanitized Windows migration context for $machineId.'",
     "git push -u origin migration/windows/$machineId/$((Get-Date).ToString('yyyyMMdd'))",
-    "```"
+    '```'
 )
 
 $summary | Set-Content -LiteralPath $summaryPath -Encoding UTF8
