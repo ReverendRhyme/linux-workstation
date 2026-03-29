@@ -28,6 +28,7 @@ This repository is designed to be portable across most Pop!_OS-compatible hardwa
 - Fastest end-to-end path (Windows export + Linux import + provisioning): `QUICKSTART.md`
 - Full walkthrough with detailed explanations: `SETUP_GUIDE.md`
 - AI-agent behavior and automation contract: `AGENTS.md`
+- Unified loop operator guide: `docs/TEST_LOOPS.md`
 
 Core commands after Pop!_OS install:
 

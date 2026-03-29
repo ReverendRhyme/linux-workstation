@@ -3,6 +3,7 @@
 This folder stores sanitized migration context exported from a Windows machine and reused during Linux provisioning.
 
 For a concise command sequence, see `QUICKSTART.md`.
+For loop-focused operations, see `docs/TEST_LOOPS.md`.
 
 ## Why this exists
 
