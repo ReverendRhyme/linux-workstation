@@ -67,7 +67,7 @@ function Invoke-CheckedStep {
         $exitCode = 1
     }
 
-    if ($output.Count -gt 0) {
+    if (@($output).Count -gt 0) {
         $output | ForEach-Object { Write-Host "    $_" }
     }
 
@@ -155,9 +155,9 @@ function Append-Incident {
         "",
         "### Key output",
         "",
-        "```text",
+        '```text',
         $keyLines,
-        "```",
+        '```',
         ""
     )
 
