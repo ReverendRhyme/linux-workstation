@@ -148,7 +148,7 @@ linux-workstation/
 │   ├── site.yml           # Main playbook (tagged by profile)
 │   └── roles/
 │       ├── base/          # Core system packages
-│       ├── gaming/        # Steam, Heroic, mangohud
+│       ├── gaming/        # Steam, Lutris, Heroic, gaming tools
 │       ├── cad/           # Blender, FreeCAD, OpenSCAD
 │       ├── printing/      # OrcaSlicer, PrusaSlicer, Cura
 │       ├── dev/           # Docker, Oh My Zsh, dev tools
@@ -192,8 +192,9 @@ linux-workstation/
 ### Gaming Stack
 | App | Purpose |
 |-----|---------|
-| Steam | PC gaming |
+| Steam (apt exception) | PC gaming |
 | Proton | Windows game compatibility |
+| Lutris | Non-Steam game launcher |
 | Heroic Games Launcher | Epic + GOG games |
 | ProtonUp-Qt | Proton GE versions |
 | MangoHud | FPS overlay |
@@ -202,6 +203,9 @@ linux-workstation/
 | Discord | Voice chat |
 
 Package source of truth: `ansible/roles/gaming/tasks/main.yml`.
+
+Flatpak-first note: gaming GUI tools prefer Flatpak for freshness; Steam remains the apt exception.
+Optional extended tools (`GAMING_EXTENDED_TOOLS=yes`): Flatseal, Warehouse, Gear Lever.
 
 ### Development Tools
 | App | Purpose |

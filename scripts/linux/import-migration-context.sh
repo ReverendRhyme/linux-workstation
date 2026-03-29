@@ -162,6 +162,7 @@ main() {
     MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
     MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
     MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
+    GAMING_EXTENDED_TOOLS="${GAMING_EXTENDED_TOOLS:-no}"
     USE_FUSION360="${USE_FUSION360:-no}"
     FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
     FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
@@ -187,6 +188,14 @@ main() {
             ;;
     esac
 
+    case "${GAMING_EXTENDED_TOOLS,,}" in
+        1|0|true|false|yes|no|on|off) ;;
+        *)
+            echo "[ERROR] Invalid GAMING_EXTENDED_TOOLS in seed: $GAMING_EXTENDED_TOOLS" >&2
+            exit 1
+            ;;
+    esac
+
     case "$FUSION360_PROVIDER" in
         codeberg-script|bottles|web|vm) ;;
         *)
@@ -206,7 +215,7 @@ main() {
     echo "[+] Imported migration context from: $CONTEXT_DIR"
     echo "[+] Resolved profile: $DEPLOY_PROFILE"
     echo "[+] Mounts: $MOUNT_GAMES, $MOUNT_STORAGE, $MOUNT_BACKUPS"
-    echo "[+] Optional flags: USE_FUSION360=$USE_FUSION360 FUSION360_PROVIDER=$FUSION360_PROVIDER ENABLE_CLOUD_SETUP=$ENABLE_CLOUD_SETUP"
+    echo "[+] Optional flags: GAMING_EXTENDED_TOOLS=$GAMING_EXTENDED_TOOLS USE_FUSION360=$USE_FUSION360 FUSION360_PROVIDER=$FUSION360_PROVIDER ENABLE_CLOUD_SETUP=$ENABLE_CLOUD_SETUP"
 
     if [[ -z "$GAMES_DRIVE" && -n "$WINDOWS_GAMES_DRIVE_HINT" ]]; then
         echo "[i] Windows games drive hint detected: $WINDOWS_GAMES_DRIVE_HINT"
@@ -238,6 +247,7 @@ BACKUP_DRIVE=$BACKUP_DRIVE
 MOUNT_GAMES=$MOUNT_GAMES
 MOUNT_STORAGE=$MOUNT_STORAGE
 MOUNT_BACKUPS=$MOUNT_BACKUPS
+GAMING_EXTENDED_TOOLS=$GAMING_EXTENDED_TOOLS
 USE_FUSION360=$USE_FUSION360
 FUSION360_PROVIDER=$FUSION360_PROVIDER
 FUSION360_FALLBACK_PROVIDER=$FUSION360_FALLBACK_PROVIDER

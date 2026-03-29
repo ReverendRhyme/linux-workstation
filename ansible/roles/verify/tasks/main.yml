@@ -6,6 +6,12 @@
 - name: Collect service facts
   ansible.builtin.service_facts:
 
+- name: Resolve verification profile flags
+  ansible.builtin.set_fact:
+    verify_deploy_profile: "{{ deploy_profile | default('full') }}"
+    verify_gaming_profile: "{{ (deploy_profile | default('full')) in ['full', 'gaming'] }}"
+    verify_gaming_extended: "{{ gaming_extended_tools | default(false) | bool }}"
+
 - name: Assert required apt packages are installed
   ansible.builtin.assert:
     that:
@@ -27,6 +33,7 @@
   ansible.builtin.command: "bash -lc 'command -v {{ item }}'"
   loop:
     - steam
+    - lutris
     - docker
     - zsh
     - rclone
@@ -79,6 +86,52 @@
     fail_msg: "Docker service is not running"
     success_msg: "Docker service is running"
   failed_when: false
+
+- name: Check required gaming flatpaks for gaming profiles
+  ansible.builtin.command:
+    cmd: "flatpak info {{ item }}"
+  loop:
+    - net.lutris.Lutris
+    - com.heroicgameslauncher.hgl
+    - net.davidotek.pupgui2
+  register: verify_gaming_flatpaks
+  changed_when: false
+  failed_when: false
+  when: verify_gaming_profile
+
+- name: Assert required gaming flatpaks are present
+  ansible.builtin.assert:
+    that: verify_gaming_flatpaks.results | map(attribute='rc') | max == 0
+    fail_msg: >-
+      One or more required gaming flatpaks are missing for profile {{ verify_deploy_profile }}.
+      Expected: Lutris, Heroic, ProtonUp-Qt.
+    success_msg: "Required gaming flatpaks are present"
+  when: verify_gaming_profile
+
+- name: Check extended gaming tools flatpaks
+  ansible.builtin.command:
+    cmd: "flatpak info {{ item }}"
+  loop:
+    - com.github.tchx84.Flatseal
+    - io.github.flattool.Warehouse
+    - it.mijorus.gearlever
+  register: verify_extended_gaming_flatpaks
+  changed_when: false
+  failed_when: false
+  when:
+    - verify_gaming_profile
+    - verify_gaming_extended
+
+- name: Assert extended gaming tools are present
+  ansible.builtin.assert:
+    that: verify_extended_gaming_flatpaks.results | map(attribute='rc') | max == 0
+    fail_msg: >-
+      Extended gaming tools requested but one or more flatpaks are missing.
+      Expected: Flatseal, Warehouse, Gear Lever.
+    success_msg: "Extended gaming tools are present"
+  when:
+    - verify_gaming_profile
+    - verify_gaming_extended
 
 - name: Resolve Fusion 360 verify provider
   ansible.builtin.set_fact:

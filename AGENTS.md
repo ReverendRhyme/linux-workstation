@@ -169,7 +169,7 @@ Use the generated JSON report to make deployment decisions:
 
 | Category | Software |
 |----------|----------|
-| **Gaming** | Steam, Heroic, ProtonUp-Qt, MangoHud, Gamemode, Discord, OBS |
+| **Gaming** | Steam, Lutris, Heroic, ProtonUp-Qt, MangoHud, Gamemode, Discord, OBS |
 | **CAD/3D** | Blender, FreeCAD, OpenSCAD, MeshLab |
 | **3D Printing** | OrcaSlicer, Bambu Studio, CHITUBOX, PrusaSlicer, Cura |
 | **Office** | LibreOffice, 1Password, Slack, Zoom, Obsidian |
@@ -205,7 +205,7 @@ sudo apt install pop-desktop
 2. **Keep scripts idempotent** - Safe to re-run
 3. **Avoid destructive changes** - Never wipe without confirmation
 4. **AMD GPU** - Use Mesa drivers only (no proprietary)
-5. **Flatpak for apps** - Steam is apt-only exception
+5. **Flatpak-first for gaming apps** - Steam is apt-only exception
 6. **nofail for mounts** - Prevent boot failure
 
 ---
@@ -375,7 +375,7 @@ linux-workstation/
 │   ├── site.yml             # Main playbook
 │   └── roles/              # Modular roles
 │       ├── base/           # Core packages
-│       ├── gaming/         # Steam, Heroic
+│       ├── gaming/         # Steam, Lutris, Heroic
 │       ├── cad/            # Blender, FreeCAD
 │       ├── printing/       # Slicers
 │       ├── dev/            # Docker, ZSH

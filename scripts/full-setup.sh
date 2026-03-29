@@ -44,6 +44,7 @@ fi
 MOUNT_GAMES="${MOUNT_GAMES:-/mnt/games}"
 MOUNT_STORAGE="${MOUNT_STORAGE:-/mnt/storage}"
 MOUNT_BACKUPS="${MOUNT_BACKUPS:-/mnt/backups}"
+GAMING_EXTENDED_TOOLS="${GAMING_EXTENDED_TOOLS:-no}"
 USE_FUSION360="${USE_FUSION360:-no}"
 FUSION360_PROVIDER="${FUSION360_PROVIDER:-codeberg-script}"
 FUSION360_FALLBACK_PROVIDER="${FUSION360_FALLBACK_PROVIDER:-bottles}"
@@ -227,7 +228,13 @@ run_bootstrap() {
     local ansible_tags
     ansible_tags="$(profile_to_ansible_tags "$profile")"
     local fusion360_bool="false"
+    local gaming_extended_bool="false"
     local fusion360_proton_bool="false"
+    case "${GAMING_EXTENDED_TOOLS,,}" in
+        1|true|yes|on)
+            gaming_extended_bool="true"
+            ;;
+    esac
     case "${USE_FUSION360,,}" in
         1|true|yes|on)
             fusion360_bool="true"
@@ -239,7 +246,7 @@ run_bootstrap() {
             ;;
     esac
     local extra_vars
-    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER fusion360_fallback_provider=$FUSION360_FALLBACK_PROVIDER fusion360_channel=$FUSION360_CHANNEL fusion360_enable_proton=$fusion360_proton_bool fusion360_proton_version=$FUSION360_PROTON_VERSION"
+    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS deploy_profile=$profile gaming_extended_tools=$gaming_extended_bool use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER fusion360_fallback_provider=$FUSION360_FALLBACK_PROVIDER fusion360_channel=$FUSION360_CHANNEL fusion360_enable_proton=$fusion360_proton_bool fusion360_proton_version=$FUSION360_PROTON_VERSION"
 
     header "Step 1: Ansible Bootstrap"
     
@@ -281,12 +288,18 @@ run_bootstrap() {
 run_verify_ansible() {
     local extra_vars
     local fusion360_bool="false"
+    local gaming_extended_bool="false"
     case "${USE_FUSION360,,}" in
         1|true|yes|on)
             fusion360_bool="true"
             ;;
     esac
-    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER"
+    case "${GAMING_EXTENDED_TOOLS,,}" in
+        1|true|yes|on)
+            gaming_extended_bool="true"
+            ;;
+    esac
+    extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS deploy_profile=${DEPLOY_PROFILE:-full} gaming_extended_tools=$gaming_extended_bool use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER"
 
     header "Verification"
     log "Running Ansible verification role"
