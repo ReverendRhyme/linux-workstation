@@ -95,6 +95,29 @@ Automation constraints for this loop:
 - Never use destructive git commands unless explicitly requested.
 - Only ask user questions when blocked by missing required values (credentials, ambiguous target disk mapping, etc.).
 
+### Command-Triggered Bare-Metal Snapshot Loop
+
+Primary trigger:
+- `run baremetal migration test loop`
+
+When triggered on Pop!_OS physical hardware:
+1. Ensure Btrfs + snapper are available (`snapper list` succeeds).
+2. Create baseline snapshot once:
+   - `./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean`
+3. (Optional) install resume service:
+   - `./scripts/linux/install-baremetal-loop-resume-service.sh`
+4. Run one loop iteration with durable state/log storage:
+   - `STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot`
+5. On failure:
+   - review `automation/test-loop/LATEST.md` and iteration log
+   - create fix branch, apply minimal fix, open PR, merge
+   - rerun loop from restored baseline
+
+Important:
+- Keep `STATE_DIR` on a mount/subvolume that survives rollback.
+- Never stage raw backup payloads in loop commits.
+- Treat snapshot rollback as destructive to uncommitted local changes.
+
 ---
 
 ## Purpose
