@@ -14,13 +14,21 @@ Goal: validate export + context generation, capture failures, and feed repair PR
 Run from repo root on Windows:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1
 ```
 
 Optional flags:
 
 - `-SkipBackup` (export + validation only)
+- `-AllBackup` (run full backup payload mode)
+- `-PlanOnlyBackup` (generate backup plan and metadata only)
 - `-PrepareFixBranch` (create `fix/migration-loop/<yyyymmdd>-<topic>` on failure)
+
+Backup policy defaults:
+
+- minimal mode by default
+- cloud-managed paths: metadata-only
+- unknown paths: skipped
 
 Expected outcomes:
 
