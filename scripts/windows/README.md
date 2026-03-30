@@ -59,13 +59,12 @@ On Linux, import and provision:
 Run the closed-loop migration QA helper (backup + export + validation + incident note on failure):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -SkipBackup
 ```
 
 Optional:
-- `-SkipBackup` to only run export + validation
-- `-AllBackup` to run full backup mode in the loop
-- `-PlanOnlyBackup` to generate backup plan/metadata without copying files
+- `-AllBackup -IncludeDownloads` for full backup payload mode
+- `-PlanOnlyBackup` to run backup planning mode without payload copy
 - `-PrepareFixBranch` to auto-create `fix/migration-loop/<yyyymmdd>-<topic>` when blocked
 
 The export includes:
