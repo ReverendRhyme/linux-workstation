@@ -12,6 +12,16 @@
       Invalid Fusion 360 provider value(s). provider={{ fusion360_effective_provider }},
       fallback={{ fusion360_effective_fallback_provider }}
 
+- name: Ensure Fusion 360 user application directory exists
+  ansible.builtin.file:
+    path: "{{ fusion360_user_home }}/.local/share/applications"
+    state: directory
+    mode: '0755'
+  become: yes
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+
 - name: Install Fusion 360 using selected provider
   block:
     - name: Run primary Fusion 360 provider tasks

@@ -11,6 +11,12 @@
         url: "https://github.com/SoftFever/OrcaSlicer/releases/latest/download/OrcaSlicer-Linux-AppImage-{{ orcaslicer_version }}.AppImage"
         dest: "/tmp/OrcaSlicer.AppImage"
         mode: '0755'
+      failed_when: false
+
+    - name: Check OrcaSlicer download
+      ansible.builtin.stat:
+        path: /tmp/OrcaSlicer.AppImage
+      register: orcaslicer_download
 
     - name: Install OrcaSlicer to /opt
       copy:
@@ -18,6 +24,7 @@
         dest: "/opt/OrcaSlicer.AppImage"
         remote_src: yes
         mode: '0755'
+      when: orcaslicer_download.stat.exists
 
     - name: Create OrcaSlicer desktop entry
       copy:
@@ -32,6 +39,7 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
+      when: orcaslicer_download.stat.exists
 
 - name: Check if Bambu Studio is installed
   ansible.builtin.stat:
@@ -46,6 +54,12 @@
         url: "https://github.com/bambulab/BambuStudio/releases/latest/download/BambuStudio_linux_amd64_v{{ bambustudio_version }}.zip"
         dest: "/tmp/BambuStudio.zip"
         mode: '0755'
+      failed_when: false
+
+    - name: Check Bambu Studio download
+      ansible.builtin.stat:
+        path: /tmp/BambuStudio.zip
+      register: bambustudio_download
 
     - name: Extract Bambu Studio
       unarchive:
@@ -53,6 +67,7 @@
         dest: "/opt/"
         remote_src: yes
         creates: "/opt/BambuStudio"
+      when: bambustudio_download.stat.exists
 
     - name: Create Bambu Studio desktop entry
       copy:
@@ -67,6 +82,7 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
+      when: bambustudio_download.stat.exists
 
 - name: Check if CHITUBOX is installed
   ansible.builtin.stat:
@@ -81,6 +97,12 @@
         url: "https://github.com/chitubox/CHITUBOX-Desktop/releases/latest/download/CHITUBOX-Desktop-linux_x64_v{{ chitubox_version }}.AppImage"
         dest: "/tmp/CHITUBOX.AppImage"
         mode: '0755'
+      failed_when: false
+
+    - name: Check CHITUBOX download
+      ansible.builtin.stat:
+        path: /tmp/CHITUBOX.AppImage
+      register: chitubox_download
 
     - name: Install CHITUBOX to /opt
       copy:
@@ -88,6 +110,7 @@
         dest: "/opt/CHITUBOX.AppImage"
         remote_src: yes
         mode: '0755'
+      when: chitubox_download.stat.exists
 
     - name: Create CHITUBOX desktop entry
       copy:
@@ -102,6 +125,7 @@
           Type=Application
           Categories=Graphics;3DGraphics;
         mode: '0644'
+      when: chitubox_download.stat.exists
 
 - name: Install PrusaSlicer (alternative slicer)
   apt:

@@ -98,6 +98,8 @@ For unattended automation:
 ## Bare-metal snapshot loop (optional)
 
 For repeatable physical-hardware testing with rollback:
+- Preflight gate is automatic (`snapper`, config access, context path, writable `STATE_DIR`).
+- On blocker, inspect `automation/test-loop/LATEST.md` for failure class + remediation hint.
 
 ```bash
 # 1) Create baseline once
@@ -108,6 +110,12 @@ For repeatable physical-hardware testing with rollback:
 
 # 3) Run one iteration and rollback
 STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
+
+# 4) Optional: auto-retry transient failures until PASS
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10
+
+# 5) Non-btrfs fallback (validation mode, no rollback)
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10 --allow-non-btrfs
 ```
 
 Use a `STATE_DIR` path that survives rollback.

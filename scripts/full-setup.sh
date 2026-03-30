@@ -154,10 +154,17 @@ check_system() {
         ((errors++))
     fi
     
-    # Check sudo
-    if ! sudo -v 2>/dev/null; then
-        error "Cannot sudo. Fix permissions first."
-        ((errors++))
+    # Check sudo (prefer non-interactive probe for automation)
+    if ! sudo -n true 2>/dev/null; then
+        if [[ -t 0 ]]; then
+            if ! sudo -v 2>/dev/null; then
+                error "Cannot sudo. Fix permissions first."
+                ((errors++))
+            fi
+        else
+            error "Cannot sudo non-interactively. Configure passwordless sudo or run in interactive terminal."
+            ((errors++))
+        fi
     fi
     
     # Check git
@@ -270,13 +277,13 @@ run_bootstrap() {
     # Run bootstrap
     if [[ -n "$ansible_tags" ]]; then
         log "Running Ansible playbook for profile '$profile' with tags: $ansible_tags"
-        if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --tags "$ansible_tags" --extra-vars "$extra_vars" --ask-become-pass; then
+        if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --tags "$ansible_tags" --extra-vars "$extra_vars"; then
             error "Bootstrap failed"
             return 1
         fi
     else
         log "Running full Ansible playbook for profile '$profile'"
-        if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --extra-vars "$extra_vars" --ask-become-pass; then
+        if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --extra-vars "$extra_vars"; then
             error "Bootstrap failed"
             return 1
         fi
@@ -304,7 +311,7 @@ run_verify_ansible() {
     header "Verification"
     log "Running Ansible verification role"
 
-    if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --tags "verify" --extra-vars "$extra_vars" --ask-become-pass; then
+    if ! sudo ansible-playbook -i ansible/inventory.yml ansible/site.yml --tags "verify" --extra-vars "$extra_vars"; then
         error "Verification failed"
         return 1
     fi

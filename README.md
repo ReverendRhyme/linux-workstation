@@ -50,8 +50,15 @@ cd <repo-directory>
 Bare-metal snapshot loop (Btrfs + snapper):
 
 ```bash
+# Preflight gate runs automatically and writes BLOCKED details to automation/test-loop/LATEST.md
 ./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean
 STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
+
+# Optional unattended retry mode (continues until PASS or max attempts)
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10
+
+# Non-btrfs fallback (no rollback safety)
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10 --allow-non-btrfs
 ```
 
 Preset options:
