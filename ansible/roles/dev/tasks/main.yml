@@ -4,8 +4,21 @@
       - zsh
       - python3-pip
       - docker.io
-      - docker-compose-plugin
     state: present
+
+- name: Install Docker Compose plugin
+  apt:
+    name: docker-compose-plugin
+    state: present
+  register: docker_compose_plugin_install
+  failed_when: false
+
+- name: Install Docker Compose v2 fallback
+  apt:
+    name: docker-compose-v2
+    state: present
+  when: "'No package matching' in (docker_compose_plugin_install.msg | default(''))"
+  failed_when: false
 
 - name: Add user to docker group
   user:
@@ -43,6 +56,6 @@
   shell: |
     RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   args:
-    creates: /home/{{ ansible_user_id }}/.oh-my-zsh
+    creates: /home/{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}/.oh-my-zsh
   become: yes
-  become_user: "{{ ansible_user_id }}"
+  become_user: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"

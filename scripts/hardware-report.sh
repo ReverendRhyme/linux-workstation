@@ -70,7 +70,7 @@ HOSTNAME_VAL="$(hostname)"
 CPU_MODEL="$(lscpu | awk -F: '/Model name/ {gsub(/^ +/, "", $2); print $2; exit}')"
 CPU_CORES="$(nproc --all 2>/dev/null || echo "unknown")"
 RAM_TOTAL="$(free -h | awk '/^Mem:/ {print $2}')"
-GPU_PRIMARY="$(lspci 2>/dev/null | grep -iE 'vga|3d|display' | head -1 | sed 's/^[^:]*: //')"
+GPU_PRIMARY="$(lspci 2>/dev/null | grep -iE 'vga|3d|display' | head -1 | sed 's/^[^:]*: //' || true)"
 
 if [[ -z "${CPU_MODEL:-}" ]]; then
     CPU_MODEL="Unknown"

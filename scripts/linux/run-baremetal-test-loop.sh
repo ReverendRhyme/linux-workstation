@@ -19,6 +19,10 @@ PREPARE_FIX_BRANCH=0
 ROLLBACK_AFTER=0
 ROLLBACK_REBOOT=0
 RESUME_MODE=0
+LOOP_UNTIL_PASS=0
+MAX_ATTEMPTS=5
+ALLOW_NON_BTRFS=0
+SNAPSHOT_ENABLED=1
 
 usage() {
     cat <<'EOF'
@@ -37,11 +41,16 @@ Options:
   --rollback-after          Stage rollback to baseline after iteration
   --rollback-reboot         Reboot immediately after rollback staging
   --resume                  Resume mode for boot-time continuation
+  --loop-until-pass         Retry iterations until PASS or max attempts
+  --max-attempts N          Max attempts when --loop-until-pass is set (default: 5)
+  --allow-non-btrfs         Run without snapshot rollback on non-btrfs root
   -h, --help                Show help
 
 Examples:
   ./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline
   ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --rollback-after --rollback-reboot
+  ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --loop-until-pass --max-attempts 10
+  ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --loop-until-pass --max-attempts 10 --allow-non-btrfs
 EOF
 }
 
@@ -54,6 +63,87 @@ require_tools() {
         echo "[ERROR] python3 is required" >&2
         exit 1
     fi
+}
+
+write_blocked_preflight() {
+    local failure_class="$1"
+    local failure_step="$2"
+    local detail="$3"
+
+    write_state "blocked" "preflight" "$failure_class" "$failure_step" "" 0
+    cat > "$STATE_DIR/LATEST.md" <<EOF
+# Bare-Metal Test Loop Latest
+
+- Run ID: $RUN_ID
+- Iteration: $ITERATION
+- Status: BLOCKED
+- Snapshot label: $SNAPSHOT_LABEL
+- Failure class: $failure_class
+- Failure step: $failure_step
+- Detail: $detail
+- Updated: $(date -Iseconds)
+EOF
+}
+
+preflight_checks() {
+    if [[ "$SNAPPER_CONFIG" == "root" ]]; then
+        local root_fs
+        root_fs="$(stat -f -c %T / 2>/dev/null || true)"
+        if [[ "$root_fs" != "btrfs" ]]; then
+            if [[ $ALLOW_NON_BTRFS -eq 1 ]]; then
+                SNAPSHOT_ENABLED=0
+                ROLLBACK_AFTER=0
+                ROLLBACK_REBOOT=0
+                echo "[WARN] root filesystem is '$root_fs'; continuing in no-rollback mode"
+            else
+            write_blocked_preflight "path" "filesystem" "root filesystem is '$root_fs' (requires btrfs for snapper root config)"
+            echo "[ERROR] root filesystem is '$root_fs'; bare-metal rollback loop requires btrfs root" >&2
+            return 1
+            fi
+        fi
+    fi
+
+    if [[ $SNAPSHOT_ENABLED -eq 0 ]]; then
+        if [[ -n "$CONTEXT_DIR" && ! -d "$CONTEXT_DIR" ]]; then
+            write_blocked_preflight "path" "context dir" "context directory missing: $CONTEXT_DIR"
+            echo "[ERROR] context directory not found: $CONTEXT_DIR" >&2
+            return 1
+        fi
+
+        if ! mkdir -p "$STATE_DIR/runs" >/dev/null 2>&1; then
+            write_blocked_preflight "permissions" "state dir" "cannot write to state dir: $STATE_DIR"
+            echo "[ERROR] cannot write to state dir: $STATE_DIR" >&2
+            return 1
+        fi
+
+        return 0
+    fi
+
+    if ! command -v snapper >/dev/null 2>&1; then
+        write_blocked_preflight "path" "snapper list" "snapper command not found"
+        echo "[ERROR] snapper is not installed or not on PATH" >&2
+        return 1
+    fi
+
+    if ! "$SNAPSHOT_HELPER" list --config "$SNAPPER_CONFIG" >/dev/null 2>&1; then
+        write_blocked_preflight "permissions" "snapper list" "snapper list failed for config '$SNAPPER_CONFIG'"
+        echo "[ERROR] snapper list failed for config '$SNAPPER_CONFIG'" >&2
+        return 1
+    fi
+
+    if [[ -n "$CONTEXT_DIR" && ! -d "$CONTEXT_DIR" ]]; then
+        write_blocked_preflight "path" "context dir" "context directory missing: $CONTEXT_DIR"
+        echo "[ERROR] context directory not found: $CONTEXT_DIR" >&2
+        return 1
+    fi
+
+    if ! mkdir -p "$STATE_DIR/runs" >/dev/null 2>&1; then
+        write_blocked_preflight "permissions" "state dir" "cannot write to state dir: $STATE_DIR"
+        echo "[ERROR] cannot write to state dir: $STATE_DIR" >&2
+        return 1
+    fi
+
+    return 0
 }
 
 classify_failure() {
@@ -100,19 +190,19 @@ write_state() {
     local log_path="${5:-}"
     local pending_resume="${6:-0}"
 
-    cat > "$STATE_FILE" <<EOF
-RUN_ID=$RUN_ID
-ITERATION=$ITERATION
-SNAPSHOT_LABEL=$SNAPSHOT_LABEL
-SNAPPER_CONFIG=$SNAPPER_CONFIG
-LAST_STATUS=$status
-LAST_STAGE=$stage
-LAST_FAILURE_CLASS=$failure_class
-LAST_FAILURE_STEP=$failure_step
-LAST_LOG_PATH=$log_path
-PENDING_RESUME=$pending_resume
-UPDATED_AT=$(date -Iseconds)
-EOF
+    {
+        printf 'RUN_ID=%q\n' "$RUN_ID"
+        printf 'ITERATION=%q\n' "$ITERATION"
+        printf 'SNAPSHOT_LABEL=%q\n' "$SNAPSHOT_LABEL"
+        printf 'SNAPPER_CONFIG=%q\n' "$SNAPPER_CONFIG"
+        printf 'LAST_STATUS=%q\n' "$status"
+        printf 'LAST_STAGE=%q\n' "$stage"
+        printf 'LAST_FAILURE_CLASS=%q\n' "$failure_class"
+        printf 'LAST_FAILURE_STEP=%q\n' "$failure_step"
+        printf 'LAST_LOG_PATH=%q\n' "$log_path"
+        printf 'PENDING_RESUME=%q\n' "$pending_resume"
+        printf 'UPDATED_AT=%q\n' "$(date -Iseconds)"
+    } > "$STATE_FILE"
 }
 
 run_step() {
@@ -317,6 +407,24 @@ parse_args() {
             --resume)
                 RESUME_MODE=1
                 ;;
+            --loop-until-pass)
+                LOOP_UNTIL_PASS=1
+                ;;
+            --max-attempts)
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "[ERROR] --max-attempts requires a value" >&2
+                    exit 1
+                fi
+                if ! [[ "$2" =~ ^[0-9]+$ ]] || [[ "$2" -lt 1 ]]; then
+                    echo "[ERROR] --max-attempts must be a positive integer" >&2
+                    exit 1
+                fi
+                MAX_ATTEMPTS="$2"
+                shift
+                ;;
+            --allow-non-btrfs)
+                ALLOW_NON_BTRFS=1
+                ;;
             -h|--help)
                 usage
                 exit 0
@@ -339,7 +447,18 @@ main() {
 
     cd "$REPO_DIR"
 
+    if ! preflight_checks; then
+        echo "Status: BLOCKED"
+        exit 1
+    fi
+
     if [[ $PREPARE_BASELINE -eq 1 ]]; then
+        if [[ $SNAPSHOT_ENABLED -eq 0 ]]; then
+            echo "[ERROR] --prepare-baseline requires btrfs snapshot mode" >&2
+            write_blocked_preflight "path" "prepare-baseline" "baseline snapshot requires btrfs root"
+            echo "Status: BLOCKED"
+            exit 1
+        fi
         "$SNAPSHOT_HELPER" create-baseline --label "$SNAPSHOT_LABEL" --config "$SNAPPER_CONFIG"
         write_state "baseline-ready" "baseline-create" "" "" "" 0
         echo "[+] Baseline snapshot ready: $SNAPSHOT_LABEL"
@@ -356,18 +475,49 @@ main() {
         write_state "resuming" "resume" "" "" "${LAST_LOG_PATH:-}" 0
     fi
 
-    if run_iteration; then
+    local attempts=0
+    local success=0
+
+    while true; do
+        attempts=$((attempts + 1))
+
+        if run_iteration; then
+            success=1
+            break
+        fi
+
+        if [[ $LOOP_UNTIL_PASS -eq 0 ]]; then
+            break
+        fi
+
+        if [[ $attempts -ge $MAX_ATTEMPTS ]]; then
+            break
+        fi
+
+        case "${LAST_FAILURE_CLASS:-script}" in
+            network|git)
+                echo "[WARN] Attempt $attempts failed (${LAST_FAILURE_CLASS:-script}); retrying..."
+                ;;
+            *)
+                echo "[WARN] Attempt $attempts failed (${LAST_FAILURE_CLASS:-script}); stopping retries"
+                break
+                ;;
+        esac
+    done
+
+    if [[ $success -eq 1 ]]; then
         if [[ $ROLLBACK_AFTER -eq 1 ]]; then
             schedule_rollback
         fi
         echo "Status: PASS"
-    else
-        echo "Status: BLOCKED"
-        if [[ $ROLLBACK_AFTER -eq 1 ]]; then
-            schedule_rollback
-        fi
-        exit 1
+        return 0
     fi
+
+    echo "Status: BLOCKED"
+    if [[ $ROLLBACK_AFTER -eq 1 ]]; then
+        schedule_rollback
+    fi
+    exit 1
 }
 
 main "$@"

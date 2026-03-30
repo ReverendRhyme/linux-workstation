@@ -10,7 +10,7 @@ fusion360_installer_sha256: ""
 fusion360_enable_proton: false
 fusion360_proton_version: "GE-Proton10-32"
 fusion360_user: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"
-fusion360_user_home: "{{ lookup('env', 'HOME') }}"
+fusion360_user_home: "{{ ('/home/' ~ lookup('env', 'SUDO_USER')) if (lookup('env', 'SUDO_USER') | length > 0) else lookup('env', 'HOME') }}"
 fusion360_install_root: "{{ fusion360_user_home }}/.autodesk_fusion"
 fusion360_binary_path: "{{ fusion360_install_root }}/bin/fusion360"
 fusion360_installer_tmp_path: "/tmp/fusion360_installer.sh"

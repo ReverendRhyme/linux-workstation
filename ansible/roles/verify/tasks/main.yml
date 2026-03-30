@@ -136,6 +136,7 @@
 - name: Resolve Fusion 360 verify provider
   ansible.builtin.set_fact:
     verify_fusion_provider: "{{ fusion360_provider | default('codeberg-script') }}"
+    verify_fusion_fallback_provider: "{{ fusion360_fallback_provider | default('none') }}"
     verify_fusion_user_home: "{{ lookup('env', 'HOME') }}"
     verify_fusion_binary_path: "{{ fusion360_binary_path | default((lookup('env', 'HOME') ~ '/.autodesk_fusion/bin/fusion360')) }}"
   when: use_fusion360 | default(false) | bool
@@ -148,13 +149,27 @@
     - use_fusion360 | default(false) | bool
     - verify_fusion_provider == 'codeberg-script'
 
+- name: Check Fusion 360 Bottles fallback desktop entry
+  ansible.builtin.stat:
+    path: "{{ fusion360_user_home }}/.local/share/applications/fusion360-bottles.desktop"
+  register: verify_fusion_bottles_entry
+  when:
+    - use_fusion360 | default(false) | bool
+    - verify_fusion_provider == 'codeberg-script'
+    - verify_fusion_fallback_provider == 'bottles'
+
 - name: Assert Fusion 360 native binary exists
   ansible.builtin.assert:
-    that: verify_fusion_binary.stat.exists
+    that:
+      - verify_fusion_binary.stat.exists
+        or (
+          verify_fusion_fallback_provider == 'bottles'
+          and (verify_fusion_bottles_entry.stat.exists | default(false))
+        )
     fail_msg: >-
       Fusion 360 required but native binary missing at {{ verify_fusion_binary_path }}.
       Try setting fusion360_fallback_provider=bottles or rerun with fusion360_enable_proton=true.
-    success_msg: "Fusion 360 native binary detected"
+    success_msg: "Fusion 360 available via native binary or Bottles fallback"
   when:
     - use_fusion360 | default(false) | bool
     - verify_fusion_provider == 'codeberg-script'
@@ -167,7 +182,7 @@
   failed_when: false
   when:
     - use_fusion360 | default(false) | bool
-    - verify_fusion_provider == 'bottles'
+    - verify_fusion_provider == 'bottles' or (verify_fusion_provider == 'codeberg-script' and verify_fusion_fallback_provider == 'bottles' and not verify_fusion_binary.stat.exists)
 
 - name: Assert Bottles is available for Fusion 360 fallback
   ansible.builtin.assert:

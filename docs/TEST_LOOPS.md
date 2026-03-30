@@ -66,11 +66,24 @@ Prerequisites:
 STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot
 ```
 
+4) Optional auto-retry mode (continue until PASS or max attempts):
+
+```bash
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10
+```
+
 Loop artifacts:
 
 - `automation/test-loop/state.env`
 - `automation/test-loop/LATEST.md`
 - `automation/test-loop/runs/<run-id>/iteration-<n>.md`
+
+Preflight + blocker behavior:
+
+- Preflight checks run before each invocation: `snapper` availability, `snapper list` for configured config, context directory (if provided), and writable `STATE_DIR`.
+- If preflight fails, status is `BLOCKED` and `automation/test-loop/LATEST.md` is updated with failure class, step, and detail.
+- `--loop-until-pass` retries only transient classes (`network`, `git`) and stops on non-transient blockers (`path`, `permissions`, `schema`, `script`).
+- On non-btrfs root, you can run setup-validation loop mode without rollback: add `--allow-non-btrfs`.
 
 References:
 

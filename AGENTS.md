@@ -104,22 +104,31 @@ Primary trigger:
 - `run baremetal migration test loop`
 
 When triggered on Pop!_OS physical hardware:
-1. Ensure Btrfs + snapper are available (`snapper list` succeeds).
+1. Run loop preflight gate and block early on unmet prerequisites:
+   - `snapper` command exists
+   - `snapper list` succeeds for configured snapper config
+   - `STATE_DIR` is writable and survives rollback
+   - context directory exists when `--context-dir` is provided
+   - if root is not btrfs, use degraded validation mode only when explicitly requested: `--allow-non-btrfs` (disables rollback)
 2. Create baseline snapshot once:
    - `./scripts/linux/run-baremetal-test-loop.sh --prepare-baseline --snapshot-label baseline-clean`
 3. (Optional) install resume service:
    - `./scripts/linux/install-baremetal-loop-resume-service.sh`
-4. Run one loop iteration with durable state/log storage:
+4. Run loop iterations with durable state/log storage:
    - `STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot`
+   - Retry mode (recommended for unattended): `... --loop-until-pass --max-attempts 10`
 5. On failure:
    - review `automation/test-loop/LATEST.md` and iteration log
-   - create fix branch, apply minimal fix, open PR, merge
-   - rerun loop from restored baseline
+   - classify blocker (`script`, `path`, `permissions`, `network`, `schema`, `git`)
+   - if blocker is transient (`network`, `git`), retry automatically up to max attempts
+   - if blocker is non-transient, create fix branch, apply minimal fix, open PR, merge, rerun loop from restored baseline
 
 Important:
 - Keep `STATE_DIR` on a mount/subvolume that survives rollback.
 - Never stage raw backup payloads in loop commits.
 - Treat snapshot rollback as destructive to uncommitted local changes.
+- Every blocked run must write/update `automation/test-loop/LATEST.md` with failure class + remediation hint.
+- `--allow-non-btrfs` is for setup-validation loops only and does not provide rollback safety.
 
 ---
 

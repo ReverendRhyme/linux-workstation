@@ -3,10 +3,30 @@
     name: blender
     state: present
 
+- name: Check FreeCAD apt availability
+  command: apt-cache policy freecad
+  register: freecad_policy
+  changed_when: false
+
 - name: Install FreeCAD (open source CAD alternative)
   apt:
     name: freecad
     state: present
+  when: "'Candidate: (none)' not in freecad_policy.stdout"
+
+- name: Check Flatpak FreeCAD
+  command: flatpak info org.freecad.FreeCAD
+  register: flatpak_freecad
+  changed_when: false
+  failed_when: false
+  when: "'Candidate: (none)' in freecad_policy.stdout"
+
+- name: Install FreeCAD Flatpak fallback
+  command: flatpak install -y flathub org.freecad.FreeCAD
+  when:
+    - "'Candidate: (none)' in freecad_policy.stdout"
+    - flatpak_freecad.rc != 0
+  failed_when: false
 
 - name: Install OpenSCAD (parametric CAD)
   apt:
