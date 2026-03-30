@@ -9,14 +9,17 @@ Run all commands from repository root.
 Run from repo root:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\windows\export-migration-context.ps1
 ```
+
+Default backup mode is minimal and policy-driven (cloud-managed paths become metadata-only, unknown paths are skipped).
+Use `-All` only when you intentionally want full payload backup.
 
 Or run the closed-loop helper:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1
 ```
 
 This creates sanitized context in `migration/context/<machine-id>/`.

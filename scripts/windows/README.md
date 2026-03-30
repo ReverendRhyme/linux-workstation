@@ -16,7 +16,18 @@ Default target root:
 Run from a PowerShell prompt on Windows:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1
+```
+
+Default behavior is minimal and policy-driven:
+- local-only migration-critical paths are backed up
+- cloud-managed paths are metadata-only
+- unknown paths are skipped
+
+Use full legacy backup mode only when needed:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 -All -IncludeDownloads
 ```
 
 For best browser/bookmark consistency, close Chrome/Edge/Firefox/Brave before running.
@@ -48,11 +59,13 @@ On Linux, import and provision:
 Run the closed-loop migration QA helper (backup + export + validation + incident note on failure):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1
 ```
 
 Optional:
 - `-SkipBackup` to only run export + validation
+- `-AllBackup` to run full backup mode in the loop
+- `-PlanOnlyBackup` to generate backup plan/metadata without copying files
 - `-PrepareFixBranch` to auto-create `fix/migration-loop/<yyyymmdd>-<topic>` when blocked
 
 The export includes:
@@ -67,7 +80,7 @@ The export includes:
 powershell -ExecutionPolicy Bypass -File .\scripts\windows\backup-to-gdrive.ps1 `
   -GoogleDriveRoot "S:\My Drive" `
   -BackupName "PopOS-Migration-Manual" `
-  -IncludeDownloads `
+  -PlanOnly `
   -HashSamplePercent 10
 ```
 
@@ -79,6 +92,8 @@ The script creates:
 S:\My Drive\PopOS-Migration-YYYYMMDD-HHMMSS\
   data\
   logs\
+  backup-decision-plan.json
+  backup-decision-plan.md
   backup-summary.csv
   backup-manifest.json
   installed-apps.csv
@@ -86,13 +101,11 @@ S:\My Drive\PopOS-Migration-YYYYMMDD-HHMMSS\
 
 ## What gets backed up
 
-- User data: Desktop, Documents, Pictures, Videos, Saved Games, optional Downloads
-- Browser data: Chrome/Edge/Brave user data, Firefox profiles
-- Bookmark artifacts: explicit `Bookmarks` files for Chrome/Edge/Brave default profiles
-- Game/launcher data: Steam userdata and metadata, Epic, GOG
-- CAD/3D data: Autodesk/Fusion/Blender and slicer configs
-- Dev/auth: `.ssh`, `.gitconfig`, PowerShell profile, VS Code/Cursor user settings
-- Installed app inventory: exported to `installed-apps.csv`
+- Minimal default: migration-critical local settings/metadata only (saved games, bookmarks, launcher metadata, CAD configs, dev settings)
+- Cloud-managed paths: metadata-only by policy (no bulk payload copy)
+- Unknown paths: skipped by policy unless `-All`
+- Full mode (`-All`): includes broad user folders and full profile payloads
+- Steam `steamapps` in minimal mode excludes large game payload directories (`common`, `downloading`, `shadercache`, `workshop`, `compatdata`, `music`)
 
 ## Exit codes
 

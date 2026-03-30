@@ -1,6 +1,8 @@
 param(
     [switch]$IncludeDownloads,
     [switch]$SkipBackup,
+    [switch]$AllBackup,
+    [switch]$PlanOnlyBackup,
     [switch]$PrepareFixBranch,
     [string]$ContextRoot = "migration/context"
 )
@@ -198,6 +200,8 @@ $before = @(Get-ChildItem -LiteralPath $contextRootPath -Directory -ErrorAction 
 if (-not $SkipBackup.IsPresent) {
     $backupArgs = @("-ExecutionPolicy", "Bypass", "-File", ".\scripts\windows\backup-to-gdrive.ps1")
     if ($IncludeDownloads.IsPresent) { $backupArgs += "-IncludeDownloads" }
+    if ($AllBackup.IsPresent) { $backupArgs += "-All" }
+    if ($PlanOnlyBackup.IsPresent) { $backupArgs += "-PlanOnly" }
     $backupResult = Invoke-CheckedStep -Name "backup-to-gdrive.ps1" -Command { powershell @backupArgs }
     if (-not $backupResult.ok) {
         $contextDir = Get-LatestContextDir -Root $contextRootPath -BeforePaths $before
