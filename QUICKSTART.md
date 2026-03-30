@@ -19,7 +19,13 @@ Use `-All` only when you intentionally want full payload backup.
 Or run the closed-loop helper:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -SkipBackup
+```
+
+Use full backup mode only when explicitly needed:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -AllBackup -IncludeDownloads
 ```
 
 This creates sanitized context in `migration/context/<machine-id>/`.

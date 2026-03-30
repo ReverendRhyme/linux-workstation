@@ -76,8 +76,9 @@ Accepted aliases:
 
 When triggered, execute this closed-loop workflow:
 1. Run Phase A Windows commands via helper script:
-   - `powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -IncludeDownloads`
-   - (or manually run `backup-to-gdrive.ps1` then `export-migration-context.ps1`)
+   - `powershell -ExecutionPolicy Bypass -File .\scripts\windows\run-migration-test-loop.ps1 -SkipBackup`
+   - Optional full backup path only when explicitly requested: `-AllBackup -IncludeDownloads`
+   - Optional policy-plan path: `-PlanOnlyBackup`
 2. Validate generated context (`deployment.seed.env`, required JSON files).
 3. If a failure occurs, stop normal flow and:
    - capture failing command, exit code, and key stderr/stdout lines
@@ -95,6 +96,7 @@ Automation constraints for this loop:
 - Never commit backup payload directories or raw/sensitive exports.
 - Never use destructive git commands unless explicitly requested.
 - Only ask user questions when blocked by missing required values (credentials, ambiguous target disk mapping, etc.).
+- Treat the primary trigger as lean/quick validation by default (`-SkipBackup`).
 
 ### Command-Triggered Bare-Metal Snapshot Loop
 
