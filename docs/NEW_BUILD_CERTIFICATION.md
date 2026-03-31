@@ -2,6 +2,9 @@
 
 Use this runbook to certify the repository on a freshly installed Linux machine.
 
+For single-disk Pop!_OS install layout with btrfs root, see:
+- `docs/POP_OS_SINGLE_DISK_BTRFS_INSTALL.md`
+
 ## Agent Trigger Phrase
 
 - `run new linux build certification`
