@@ -10,6 +10,12 @@
     state: directory
     mode: '0755'
 
+- name: Ensure local pixmaps directory exists
+  ansible.builtin.file:
+    path: /usr/local/share/pixmaps
+    state: directory
+    mode: '0755'
+
 - name: Install OrcaSlicer (3D printing slicer)
   when:
     - install_orcaslicer | bool
@@ -64,7 +70,7 @@
           Name=OrcaSlicer
           Comment=3D Printer Slicer
           Exec=/opt/OrcaSlicer.AppImage
-          Icon=org.softfever.orcaslicer
+          Icon={{ orcaslicer_icon_path }}
           Terminal=false
           Type=Application
           Categories=Graphics;3DGraphics;
@@ -77,6 +83,42 @@
   register: orcaslicer_binary_exists
   when: install_orcaslicer | bool
 
+- name: Check OrcaSlicer icon artifact after role execution
+  ansible.builtin.stat:
+    path: "{{ orcaslicer_icon_path }}"
+  register: orcaslicer_icon_exists
+  when: install_orcaslicer | bool
+
+- name: Ensure OrcaSlicer icon exists
+  when:
+    - install_orcaslicer | bool
+    - orcaslicer_binary_exists.stat.exists
+    - not orcaslicer_icon_exists.stat.exists
+  block:
+    - name: Create temp directory for OrcaSlicer icon extraction
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: orcaslicer-icon-
+      register: orcaslicer_icon_extract_dir
+
+    - name: Extract OrcaSlicer AppImage payload
+      ansible.builtin.command: /opt/OrcaSlicer.AppImage --appimage-extract
+      args:
+        chdir: "{{ orcaslicer_icon_extract_dir.path }}"
+      changed_when: true
+
+    - name: Copy OrcaSlicer icon from AppImage payload
+      ansible.builtin.copy:
+        src: "{{ orcaslicer_icon_extract_dir.path }}/squashfs-root/usr/share/icons/hicolor/192x192/apps/OrcaSlicer.png"
+        dest: "{{ orcaslicer_icon_path }}"
+        remote_src: true
+        mode: '0644'
+
+    - name: Remove temporary OrcaSlicer extraction directory
+      ansible.builtin.file:
+        path: "{{ orcaslicer_icon_extract_dir.path }}"
+        state: absent
+
 - name: Ensure OrcaSlicer desktop entry exists
   ansible.builtin.copy:
     dest: "/usr/local/share/applications/OrcaSlicer.desktop"
@@ -85,7 +127,7 @@
       Name=OrcaSlicer
       Comment=3D Printer Slicer
       Exec=/opt/OrcaSlicer.AppImage
-      Icon=org.softfever.orcaslicer
+      Icon={{ orcaslicer_icon_path }}
       Terminal=false
       Type=Application
       Categories=Graphics;3DGraphics;

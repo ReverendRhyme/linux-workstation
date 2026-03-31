@@ -6,3 +6,4 @@ install_prusaslicer: false
 install_cura: false
 
 printing_data_dir: "{{ ansible_user_dir }}/3dprinting"
+orcaslicer_icon_path: /usr/local/share/pixmaps/OrcaSlicer.png
