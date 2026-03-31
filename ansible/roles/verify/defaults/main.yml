@@ -2,3 +2,5 @@
 mount_games: /mnt/games
 mount_storage: /mnt/storage
 mount_backups: /mnt/backups
+verify_enforce_productivity_catalog: false
+verify_enforce_printing_catalog: true

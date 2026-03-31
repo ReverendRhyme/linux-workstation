@@ -1,5 +1,8 @@
 ---
-orcaslicer_version: "1.9.0"
-bambustudio_version: "2.0.0"
-chitubox_version: "2.0"
+install_orcaslicer: true
+install_bambustudio: false
+install_chitubox: false
+install_prusaslicer: false
+install_cura: false
+
 printing_data_dir: "{{ ansible_user_dir }}/3dprinting"
