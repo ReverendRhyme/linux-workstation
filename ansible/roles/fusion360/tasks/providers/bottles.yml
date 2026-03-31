@@ -17,6 +17,100 @@
     or 'installing' in (fusion360_bottles_install.stdout | default(''))
   failed_when: false
 
+- name: Check Bottles Flatpak permissions
+  ansible.builtin.command:
+    cmd: flatpak info --show-permissions com.usebottles.bottles
+  register: fusion360_bottles_permissions
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+
+- name: Ensure Bottles Flatpak can access user home
+  ansible.builtin.command:
+    cmd: flatpak override --user --filesystem=home com.usebottles.bottles
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  when: >-
+    fusion360_bottles_permissions.rc != 0
+    or 'home;' not in (fusion360_bottles_permissions.stdout | default(''))
+
+- name: Check Fusion360 bottle dosdevices path
+  ansible.builtin.stat:
+    path: "{{ fusion360_user_home }}/.var/app/com.usebottles.bottles/data/bottles/bottles/Fusion360/dosdevices"
+  register: fusion360_bottle_dosdevices
+
+- name: Check Fusion360 bottle config path
+  ansible.builtin.stat:
+    path: "{{ fusion360_user_home }}/.var/app/com.usebottles.bottles/data/bottles/bottles/Fusion360/bottle.yml"
+  register: fusion360_bottle_config
+
+- name: Map Fusion360 bottle Z drive to user home
+  ansible.builtin.file:
+    src: "{{ fusion360_user_home }}"
+    dest: "{{ fusion360_user_home }}/.var/app/com.usebottles.bottles/data/bottles/bottles/Fusion360/dosdevices/z:"
+    state: link
+    force: true
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  when: fusion360_bottle_dosdevices.stat.exists
+
+- name: List available Bottles components
+  ansible.builtin.command:
+    cmd: flatpak run --command=bottles-cli com.usebottles.bottles list components
+  register: fusion360_bottles_components
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  when: fusion360_bottle_config.stat.exists
+
+- name: Prefer sys-wine-11.0 runner for Fusion360 bottle when available
+  ansible.builtin.command:
+    cmd: flatpak run --command=bottles-cli com.usebottles.bottles edit -b Fusion360 --runner sys-wine-11.0
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  changed_when: false
+  failed_when: false
+  when:
+    - fusion360_bottle_config.stat.exists
+
+- name: Ensure Fusion360 bottle temp directory exists
+  ansible.builtin.file:
+    path: "{{ fusion360_user_home }}/.var/app/com.usebottles.bottles/data/bottles/bottles/Fusion360/drive_c/users/{{ fusion360_user }}/Temp"
+    state: directory
+    mode: '0755'
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  when: fusion360_bottle_config.stat.exists
+
+- name: Set Fusion360 bottle temp environment variables
+  ansible.builtin.command:
+    cmd: "flatpak run --command=bottles-cli com.usebottles.bottles edit -b Fusion360 --env-var {{ item }}"
+  become: true
+  become_user: "{{ fusion360_user }}"
+  environment:
+    HOME: "{{ fusion360_user_home }}"
+  loop:
+    - "TEMP=C:\\users\\{{ fusion360_user }}\\Temp"
+    - "TMP=C:\\users\\{{ fusion360_user }}\\Temp"
+    - "TMPDIR=/var/tmp"
+  changed_when: false
+  failed_when: false
+  when: fusion360_bottle_config.stat.exists
+
 - name: Create Fusion 360 Bottles helper desktop entry
   ansible.builtin.copy:
     dest: "{{ fusion360_user_home }}/.local/share/applications/fusion360-bottles.desktop"

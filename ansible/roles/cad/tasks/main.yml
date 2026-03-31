@@ -62,3 +62,36 @@
 - name: Install Fusion 360 web app (PWA)
   debug:
     msg: "Fusion 360 web version available at https://fusion.cloud.autodesk.com"
+
+- name: Resolve CAD launcher user
+  set_fact:
+    cad_user: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"
+    cad_user_home: "{{ ('/home/' ~ lookup('env', 'SUDO_USER')) if (lookup('env', 'SUDO_USER') | length > 0) else lookup('env', 'HOME') }}"
+
+- name: Ensure CAD desktop entry directory exists
+  file:
+    path: "{{ cad_user_home }}/.local/share/applications"
+    state: directory
+    mode: '0755'
+  become: true
+  become_user: "{{ cad_user }}"
+  environment:
+    HOME: "{{ cad_user_home }}"
+
+- name: Create Onshape web desktop entry
+  copy:
+    dest: "{{ cad_user_home }}/.local/share/applications/onshape.desktop"
+    mode: '0644'
+    content: |
+      [Desktop Entry]
+      Name=Onshape
+      Comment=Cloud-native CAD in your browser
+      Exec=xdg-open https://cad.onshape.com
+      Icon=applications-engineering
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;CAD;
+  become: true
+  become_user: "{{ cad_user }}"
+  environment:
+    HOME: "{{ cad_user_home }}"
