@@ -72,11 +72,20 @@ STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal
 STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --loop-until-pass --max-attempts 10
 ```
 
+5) Self-healing GitHub loop (branch -> commit -> PR -> merge -> rerun):
+
+```bash
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-self-healing-loop.sh --context-dir migration/context/<machine-id> --allow-non-btrfs --max-cycles 5 --max-attempts 3
+```
+
 Loop artifacts:
 
 - `automation/test-loop/state.env`
 - `automation/test-loop/LATEST.md`
 - `automation/test-loop/runs/<run-id>/iteration-<n>.md`
+- `automation/test-loop/runs/<run-id>/AI_FEEDBACK.md`
+- `automation/test-loop/runs/<run-id>/HANDOFF.md`
+- `automation/test-loop/HANDOFF.md`
 
 Preflight + blocker behavior:
 
@@ -90,6 +99,7 @@ References:
 - `automation/test-loop/README.md`
 - `scripts/linux/run-baremetal-test-loop.sh --help`
 - `scripts/linux/btrfs-snapshot-loop.sh --help`
+- `scripts/linux/run-self-healing-loop.sh --help`
 
 ## Safety Rules
 

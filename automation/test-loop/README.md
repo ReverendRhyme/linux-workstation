@@ -7,6 +7,9 @@ This directory stores state and logs for snapshot-based bare-metal test loops.
 - `state.env` - current loop state used for resume after reboot
 - `LATEST.md` - latest run summary
 - `runs/<run-id>/iteration-<n>.md` - per-iteration command logs
+- `runs/<run-id>/AI_FEEDBACK.md` - AI feedback journal (what worked, what failed, what changed)
+- `runs/<run-id>/HANDOFF.md` - per-run AI handoff notes for next restore/test round
+- `HANDOFF.md` - latest handoff snapshot (copied from the active run)
 
 ## Durability note
 

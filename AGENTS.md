@@ -103,6 +103,9 @@ Automation constraints for this loop:
 Primary trigger:
 - `run baremetal migration test loop`
 
+Accepted self-healing trigger:
+- `run baremetal migration self-healing loop`
+
 When triggered on Pop!_OS physical hardware:
 1. Run loop preflight gate and block early on unmet prerequisites:
    - `snapper` command exists
@@ -117,6 +120,7 @@ When triggered on Pop!_OS physical hardware:
 4. Run loop iterations with durable state/log storage:
    - `STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal-test-loop.sh --context-dir migration/context/<machine-id> --pull-latest --prepare-fix-branch --rollback-after --rollback-reboot`
    - Retry mode (recommended for unattended): `... --loop-until-pass --max-attempts 10`
+   - Full self-healing GitHub cycle: `STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-self-healing-loop.sh --context-dir migration/context/<machine-id> --max-cycles 5 --max-attempts 3`
 5. On failure:
    - review `automation/test-loop/LATEST.md` and iteration log
    - classify blocker (`script`, `path`, `permissions`, `network`, `schema`, `git`)
