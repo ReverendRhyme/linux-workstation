@@ -33,6 +33,9 @@ If drive layout or install mode is unclear, ask before changing mount or partiti
 
 This wrapper runs: guided/non-interactive config -> profile provisioning -> verification.
 
+Full-profile policy:
+- Treat `full` as "install everything" (includes Fusion 360, extended gaming tools, and cloud setup defaults).
+
 ### Migration-Context-Aware Flow (Recommended)
 
 When helping with Windows -> Pop!_OS migration, use this two-phase flow:
