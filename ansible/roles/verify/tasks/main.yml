@@ -59,6 +59,80 @@
       | map(attribute='item')
       | list }}
 
+- name: Set expected software catalog for full profile
+  ansible.builtin.set_fact:
+    verify_expected_productivity_flatpaks:
+      - com.1password.1Password
+      - com.slack.Slack
+      - us.zoom.Zoom
+      - md.obsidian.Obsidian
+      - com.spotify.Client
+    verify_expected_printing_artifacts:
+      - /opt/OrcaSlicer.AppImage
+      - /usr/local/share/applications/OrcaSlicer.desktop
+
+- name: Check productivity flatpaks for full profile
+  ansible.builtin.command:
+    cmd: "flatpak info {{ item }}"
+  loop: "{{ verify_expected_productivity_flatpaks }}"
+  register: verify_productivity_flatpaks
+  changed_when: false
+  failed_when: false
+  when: verify_deploy_profile == 'full'
+
+- name: Report missing productivity flatpaks
+  ansible.builtin.debug:
+    msg: >-
+      Missing productivity flatpaks: {{ verify_productivity_flatpaks.results
+      | rejectattr('rc', 'equalto', 0)
+      | map(attribute='item')
+      | list }}
+  when: verify_deploy_profile == 'full'
+
+- name: Assert productivity flatpaks are present for full profile
+  ansible.builtin.assert:
+    that:
+      - (verify_productivity_flatpaks.results | rejectattr('rc', 'equalto', 0) | list | length) == 0
+    fail_msg: >-
+      Missing required productivity flatpaks for full profile: {{ verify_productivity_flatpaks.results
+      | rejectattr('rc', 'equalto', 0)
+      | map(attribute='item')
+      | list | join(', ') }}
+    success_msg: "Required productivity flatpaks are present"
+  when:
+    - verify_deploy_profile == 'full'
+    - verify_enforce_productivity_catalog | bool
+
+- name: Check printing artifacts exist for full and gaming profiles
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ verify_expected_printing_artifacts }}"
+  register: verify_printing_artifacts
+  when: verify_deploy_profile in ['full', 'gaming']
+
+- name: Report missing printing artifacts
+  ansible.builtin.debug:
+    msg: >-
+      Missing printing artifacts: {{ verify_printing_artifacts.results
+      | rejectattr('stat.exists', 'equalto', true)
+      | map(attribute='item')
+      | list }}
+  when: verify_deploy_profile in ['full', 'gaming']
+
+- name: Assert printing artifacts are present
+  ansible.builtin.assert:
+    that:
+      - (verify_printing_artifacts.results | rejectattr('stat.exists', 'equalto', true) | list | length) == 0
+    fail_msg: >-
+      Missing expected printing installs: {{ verify_printing_artifacts.results
+      | rejectattr('stat.exists', 'equalto', true)
+      | map(attribute='item')
+      | list | join(', ') }}
+    success_msg: "Expected printing artifacts are present"
+  when:
+    - verify_deploy_profile in ['full', 'gaming']
+    - verify_enforce_printing_catalog | bool
+
 - name: Assert game mount directory exists
   ansible.builtin.stat:
     path: "{{ mount_games }}"

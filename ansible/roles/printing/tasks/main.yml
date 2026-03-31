@@ -2,13 +2,43 @@
   ansible.builtin.stat:
     path: /opt/OrcaSlicer.AppImage
   register: orcaslicer_installed
+  when: install_orcaslicer | bool
+
+- name: Ensure local applications directory exists
+  ansible.builtin.file:
+    path: /usr/local/share/applications
+    state: directory
+    mode: '0755'
 
 - name: Install OrcaSlicer (3D printing slicer)
-  when: not orcaslicer_installed.stat.exists
+  when:
+    - install_orcaslicer | bool
+    - not orcaslicer_installed.stat.exists
   block:
+    - name: Query OrcaSlicer latest release metadata
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/SoftFever/OrcaSlicer/releases/latest
+        return_content: true
+      register: orcaslicer_release
+
+    - name: Resolve OrcaSlicer latest AppImage URL
+      ansible.builtin.set_fact:
+        orcaslicer_download_url: >-
+          {{
+            (orcaslicer_release.json.assets
+            | json_query("[?contains(name, 'Linux') && contains(name, 'AppImage')].browser_download_url | [0]"))
+            | default('')
+          }}
+
+    - name: Assert OrcaSlicer latest asset URL was found
+      ansible.builtin.assert:
+        that:
+          - orcaslicer_download_url | length > 0
+        fail_msg: "Could not locate latest OrcaSlicer AppImage asset URL"
+
     - name: Download OrcaSlicer AppImage
       get_url:
-        url: "https://github.com/SoftFever/OrcaSlicer/releases/latest/download/OrcaSlicer-Linux-AppImage-{{ orcaslicer_version }}.AppImage"
+        url: "{{ orcaslicer_download_url }}"
         dest: "/tmp/OrcaSlicer.AppImage"
         mode: '0755'
       failed_when: false
@@ -41,17 +71,64 @@
         mode: '0644'
       when: orcaslicer_download.stat.exists
 
+- name: Check OrcaSlicer install artifact after role execution
+  ansible.builtin.stat:
+    path: /opt/OrcaSlicer.AppImage
+  register: orcaslicer_binary_exists
+  when: install_orcaslicer | bool
+
+- name: Ensure OrcaSlicer desktop entry exists
+  ansible.builtin.copy:
+    dest: "/usr/local/share/applications/OrcaSlicer.desktop"
+    content: |
+      [Desktop Entry]
+      Name=OrcaSlicer
+      Comment=3D Printer Slicer
+      Exec=/opt/OrcaSlicer.AppImage
+      Icon=org.softfever.orcaslicer
+      Terminal=false
+      Type=Application
+      Categories=Graphics;3DGraphics;
+    mode: '0644'
+  when:
+    - install_orcaslicer | bool
+    - orcaslicer_binary_exists.stat.exists
+
 - name: Check if Bambu Studio is installed
   ansible.builtin.stat:
     path: /opt/BambuStudio
   register: bambustudio_installed
+  when: install_bambustudio | bool
 
 - name: Install Bambu Studio (Bambu Lab slicer)
-  when: not bambustudio_installed.stat.exists
+  when:
+    - install_bambustudio | bool
+    - not bambustudio_installed.stat.exists
   block:
+    - name: Query Bambu Studio latest release metadata
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/bambulab/BambuStudio/releases/latest
+        return_content: true
+      register: bambustudio_release
+
+    - name: Resolve Bambu Studio latest Linux zip URL
+      ansible.builtin.set_fact:
+        bambustudio_download_url: >-
+          {{
+            (bambustudio_release.json.assets
+            | json_query("[?contains(name, 'BambuStudio') && contains(name, 'linux')].browser_download_url | [0]"))
+            | default('')
+          }}
+
+    - name: Assert Bambu Studio latest asset URL was found
+      ansible.builtin.assert:
+        that:
+          - bambustudio_download_url | length > 0
+        fail_msg: "Could not locate latest Bambu Studio Linux zip asset URL"
+
     - name: Download Bambu Studio AppImage
       get_url:
-        url: "https://github.com/bambulab/BambuStudio/releases/latest/download/BambuStudio_linux_amd64_v{{ bambustudio_version }}.zip"
+        url: "{{ bambustudio_download_url }}"
         dest: "/tmp/BambuStudio.zip"
         mode: '0755'
       failed_when: false
@@ -88,13 +165,37 @@
   ansible.builtin.stat:
     path: /opt/CHITUBOX.AppImage
   register: chitubox_installed
+  when: install_chitubox | bool
 
 - name: Install CHITUBOX (resin printing slicer)
-  when: not chitubox_installed.stat.exists
+  when:
+    - install_chitubox | bool
+    - not chitubox_installed.stat.exists
   block:
+    - name: Query CHITUBOX latest release metadata
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/chitubox/CHITUBOX-Desktop/releases/latest
+        return_content: true
+      register: chitubox_release
+
+    - name: Resolve CHITUBOX latest Linux AppImage URL
+      ansible.builtin.set_fact:
+        chitubox_download_url: >-
+          {{
+            (chitubox_release.json.assets
+            | json_query("[?contains(name, 'CHITUBOX') && contains(name, 'linux') && contains(name, 'AppImage')].browser_download_url | [0]"))
+            | default('')
+          }}
+
+    - name: Assert CHITUBOX latest asset URL was found
+      ansible.builtin.assert:
+        that:
+          - chitubox_download_url | length > 0
+        fail_msg: "Could not locate latest CHITUBOX Linux AppImage asset URL"
+
     - name: Download CHITUBOX AppImage
       get_url:
-        url: "https://github.com/chitubox/CHITUBOX-Desktop/releases/latest/download/CHITUBOX-Desktop-linux_x64_v{{ chitubox_version }}.AppImage"
+        url: "{{ chitubox_download_url }}"
         dest: "/tmp/CHITUBOX.AppImage"
         mode: '0755'
       failed_when: false
@@ -132,12 +233,14 @@
     name: prusaslicer
     state: present
   failed_when: false
+  when: install_prusaslicer | bool
 
 - name: Install Cura (Ultimaker slicer)
   apt:
     name: cura
     state: present
   failed_when: false
+  when: install_cura | bool
 
 - name: Create 3D printing data directory
   file:
