@@ -70,6 +70,7 @@
     verify_expected_printing_artifacts:
       - /opt/OrcaSlicer.AppImage
       - /usr/local/share/applications/OrcaSlicer.desktop
+      - /usr/local/share/pixmaps/OrcaSlicer.png
 
 - name: Check productivity flatpaks for full profile
   ansible.builtin.command:
