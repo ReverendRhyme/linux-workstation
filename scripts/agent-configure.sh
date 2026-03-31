@@ -285,6 +285,12 @@ run_non_interactive() {
     FUSION360_PROTON_VERSION="${FUSION360_PROTON_VERSION:-GE-Proton10-32}"
     ENABLE_CLOUD_SETUP="${ENABLE_CLOUD_SETUP:-no}"
 
+    if [[ "$DEPLOY_PROFILE" == "full" ]]; then
+        GAMING_EXTENDED_TOOLS="yes"
+        USE_FUSION360="yes"
+        ENABLE_CLOUD_SETUP="yes"
+    fi
+
     mkdir -p "$CONFIG_DIR" "$LOG_DIR"
     : > "$CONFIG_FILE"
 

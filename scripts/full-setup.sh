@@ -17,7 +17,7 @@ set -euo pipefail
 #   ./scripts/full-setup.sh --verify     # Verify installation
 #
 # Profiles:
-#   ./scripts/full-setup.sh --profile full       # Complete setup
+#   ./scripts/full-setup.sh --profile full       # Complete setup (installs everything)
 #   ./scripts/full-setup.sh --profile gaming     # Gaming stack
 #   ./scripts/full-setup.sh --profile dev        # Development tools
 #   ./scripts/full-setup.sh --profile minimal    # Core utilities only
@@ -252,6 +252,12 @@ run_bootstrap() {
             fusion360_proton_bool="true"
             ;;
     esac
+
+    if [[ "$profile" == "full" ]]; then
+        gaming_extended_bool="true"
+        fusion360_bool="true"
+    fi
+
     local extra_vars
     extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS deploy_profile=$profile gaming_extended_tools=$gaming_extended_bool use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER fusion360_fallback_provider=$FUSION360_FALLBACK_PROVIDER fusion360_channel=$FUSION360_CHANNEL fusion360_enable_proton=$fusion360_proton_bool fusion360_proton_version=$FUSION360_PROTON_VERSION"
 
@@ -306,6 +312,12 @@ run_verify_ansible() {
             gaming_extended_bool="true"
             ;;
     esac
+
+    if [[ "${DEPLOY_PROFILE:-full}" == "full" ]]; then
+        gaming_extended_bool="true"
+        fusion360_bool="true"
+    fi
+
     extra_vars="mount_games=$MOUNT_GAMES mount_storage=$MOUNT_STORAGE mount_backups=$MOUNT_BACKUPS deploy_profile=${DEPLOY_PROFILE:-full} gaming_extended_tools=$gaming_extended_bool use_fusion360=$fusion360_bool fusion360_provider=$FUSION360_PROVIDER"
 
     header "Verification"

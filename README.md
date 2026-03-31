@@ -62,7 +62,7 @@ STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-baremetal
 ```
 
 Preset options:
-- `single-disk` - single-drive systems, full profile
+- `single-disk` - single-drive systems, full profile (installs everything by default)
 - `dual-disk` - gaming-focused dual-drive systems
 - `dual-boot` - dual-boot install mode with gaming profile
 
@@ -88,7 +88,8 @@ Use `QUICKSTART.md` for the canonical command sequence.
 Detailed migration policy (allowlist, safety rules, and AI-agent contract):
 - `migration/README.md`
 
-Fusion 360 native runtime defaults:
+Fusion 360 native runtime defaults (enabled for full installs):
+- `USE_FUSION360=yes`
 - `FUSION360_PROVIDER=codeberg-script`
 - `FUSION360_FALLBACK_PROVIDER=bottles`
 
