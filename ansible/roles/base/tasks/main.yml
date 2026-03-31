@@ -67,15 +67,43 @@
     state: present
   failed_when: false
 
-- name: Check 1Password flatpak
+- name: Resolve 1Password apt architecture
+  set_fact:
+    onepassword_apt_arch: >-
+      {{ 'amd64' if ansible_architecture in ['x86_64', 'amd64']
+      else 'arm64' if ansible_architecture in ['aarch64', 'arm64']
+      else ansible_architecture }}
+
+- name: Check legacy 1Password flatpak install
   command: flatpak info com.1password.1Password
-  register: flatpak_1password
+  register: flatpak_1password_legacy
   changed_when: false
   failed_when: false
 
+- name: Remove legacy 1Password flatpak install
+  command: flatpak uninstall -y --system com.1password.1Password
+  when: flatpak_1password_legacy.rc == 0
+  failed_when: false
+
+- name: Add 1Password apt signing key
+  apt_key:
+    url: https://downloads.1password.com/linux/keys/1password.asc
+    keyring: /usr/share/keyrings/1password-archive-keyring.gpg
+    state: present
+  failed_when: false
+
+- name: Add 1Password apt repository
+  apt_repository:
+    repo: "deb [arch={{ onepassword_apt_arch }} signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/{{ onepassword_apt_arch }} stable main"
+    filename: 1password
+    state: present
+    update_cache: yes
+  failed_when: false
+
 - name: Install 1Password (password manager)
-  command: flatpak install -y flathub com.1password.1Password
-  when: flatpak_1password.rc != 0
+  apt:
+    name: 1password
+    state: present
   failed_when: false
 
 - name: Check Slack flatpak

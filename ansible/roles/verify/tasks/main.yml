@@ -61,12 +61,18 @@
 
 - name: Set expected software catalog for full profile
   ansible.builtin.set_fact:
+    verify_expected_productivity_apt_packages:
+      - 1password
     verify_expected_productivity_flatpaks:
-      - com.1password.1Password
       - com.slack.Slack
       - us.zoom.Zoom
       - md.obsidian.Obsidian
       - com.spotify.Client
+    verify_productivity_flatpak_smoke_commands:
+      com.slack.Slack: "flatpak run --command=slack com.slack.Slack --version"
+      us.zoom.Zoom: "flatpak run --command=zoom us.zoom.Zoom --version"
+      md.obsidian.Obsidian: "flatpak run --command=obsidian md.obsidian.Obsidian --help"
+      com.spotify.Client: "flatpak run --command=spotify com.spotify.Client --version"
     verify_expected_printing_artifacts:
       - /opt/OrcaSlicer.AppImage
       - /usr/local/share/applications/OrcaSlicer.desktop
@@ -80,6 +86,59 @@
   changed_when: false
   failed_when: false
   when: verify_deploy_profile == 'full'
+
+- name: Smoke test productivity flatpak launch commands
+  ansible.builtin.command:
+    cmd: "{{ verify_productivity_flatpak_smoke_commands[item] }}"
+  loop: "{{ verify_expected_productivity_flatpaks }}"
+  register: verify_productivity_flatpak_smoke
+  changed_when: false
+  failed_when: false
+  when: verify_deploy_profile == 'full'
+
+- name: Report broken productivity flatpak smoke tests
+  ansible.builtin.debug:
+    msg: >-
+      Productivity flatpaks with failed smoke test: {{ verify_productivity_flatpak_smoke.results
+      | rejectattr('rc', 'equalto', 0)
+      | map(attribute='item')
+      | list }}
+  when: verify_deploy_profile == 'full'
+
+- name: Assert productivity flatpak smoke tests pass for full profile
+  ansible.builtin.assert:
+    that:
+      - (verify_productivity_flatpak_smoke.results | rejectattr('rc', 'equalto', 0) | list | length) == 0
+    fail_msg: >-
+      Productivity flatpaks failed smoke testing: {{ verify_productivity_flatpak_smoke.results
+      | rejectattr('rc', 'equalto', 0)
+      | map(attribute='item')
+      | list | join(', ') }}
+    success_msg: "Productivity flatpaks pass smoke tests"
+  when:
+    - verify_deploy_profile == 'full'
+    - verify_enforce_productivity_catalog | bool
+
+- name: Report missing productivity apt packages
+  ansible.builtin.debug:
+    msg: >-
+      Missing productivity apt packages: {{ verify_expected_productivity_apt_packages
+      | reject('in', ansible_facts.packages.keys() | list)
+      | list }}
+  when: verify_deploy_profile == 'full'
+
+- name: Assert productivity apt packages are present for full profile
+  ansible.builtin.assert:
+    that:
+      - (verify_expected_productivity_apt_packages | reject('in', ansible_facts.packages.keys() | list) | list | length) == 0
+    fail_msg: >-
+      Missing required productivity apt packages for full profile: {{ verify_expected_productivity_apt_packages
+      | reject('in', ansible_facts.packages.keys() | list)
+      | list | join(', ') }}
+    success_msg: "Required productivity apt packages are present"
+  when:
+    - verify_deploy_profile == 'full'
+    - verify_enforce_productivity_catalog | bool
 
 - name: Report missing productivity flatpaks
   ansible.builtin.debug:
