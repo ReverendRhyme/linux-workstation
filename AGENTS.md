@@ -11,6 +11,7 @@
 
 For a concise command-only runbook, see `QUICKSTART.md`.
 For loop-focused operations, see `docs/TEST_LOOPS.md`.
+For fresh-host validation, see `docs/NEW_BUILD_CERTIFICATION.md`.
 
 When a user says "set up my Linux workstation" or "run the setup":
 
@@ -105,6 +106,13 @@ Primary trigger:
 
 Accepted self-healing trigger:
 - `run baremetal migration self-healing loop`
+
+New-build certification trigger:
+- `run new linux build certification`
+
+When triggered, run:
+- `./scripts/linux/run-new-build-certification.sh --context-dir migration/context/<machine-id>`
+- report `automation/new-build-certification/<run-id>/SUMMARY.md`
 
 When triggered on Pop!_OS physical hardware:
 1. Run loop preflight gate and block early on unmet prerequisites:

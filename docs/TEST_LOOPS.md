@@ -100,6 +100,7 @@ References:
 - `scripts/linux/run-baremetal-test-loop.sh --help`
 - `scripts/linux/btrfs-snapshot-loop.sh --help`
 - `scripts/linux/run-self-healing-loop.sh --help`
+- `docs/NEW_BUILD_CERTIFICATION.md`
 
 ## Safety Rules
 
