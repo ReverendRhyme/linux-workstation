@@ -18,6 +18,25 @@ and report the summary file path.
 ./scripts/linux/run-new-build-certification.sh --context-dir migration/context/<machine-id>
 ```
 
+## Fresh Build Prerequisites (Snapshot Mode)
+
+Before first certification on a brand-new Pop!_OS install, ensure snapper is installed and configured.
+
+```bash
+sudo apt update
+sudo apt install -y btrfs-progs snapper
+sudo snapper -c root create-config /
+findmnt -no FSTYPE /
+sudo snapper -c root list
+```
+
+Expected:
+
+- root filesystem reports `btrfs`
+- `snapper -c root list` succeeds
+
+If these are missing, the loop preflight blocks with `Failure step: snapper list`.
+
 This command performs:
 
 1. `./scripts/full-setup.sh --check`
@@ -56,3 +75,21 @@ Loop artifacts remain in the configured loop state dir (default: `automation/tes
 - dry run passes
 - profile + verify pass (unless explicitly skipped)
 - self-healing loop returns PASS (unless explicitly skipped)
+
+## Restore + Second Run From Scratch
+
+Use this sequence after validating one run and wanting a clean rerun from the baseline snapshot.
+
+```bash
+# 1) Roll back to baseline and reboot into the restored system
+./scripts/linux/btrfs-snapshot-loop.sh rollback --label baseline-clean --config root --reboot
+
+# 2) After reboot, rerun full certification with persistent state
+STATE_DIR=/mnt/storage/linux-workstation-test-loop ./scripts/linux/run-new-build-certification.sh --auto-pr --max-cycles 5 --max-attempts 3
+```
+
+Review artifacts:
+
+- `automation/new-build-certification/<run-id>/SUMMARY.md`
+- `/mnt/storage/linux-workstation-test-loop/LATEST.md`
+- `/mnt/storage/linux-workstation-test-loop/HANDOFF.md`
